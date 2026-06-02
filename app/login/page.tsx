@@ -77,6 +77,9 @@ export default function Login() {
             provider: "google",
             options: {
                 redirectTo: `${window.location.origin}/login`,
+                queryParams: {
+                    prompt: "select_account",
+                },
             },
         });
         if (error) {
