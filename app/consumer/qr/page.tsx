@@ -242,7 +242,7 @@ export default function QRPage() {
                                 <div style={{ fontSize: "12px", color: "#60a5fa", fontWeight: "600", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>📱 Product QR Code</div>
                                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>Scan to verify authenticity of this product</div>
                                 <div style={{ display: "inline-block", background: "white", padding: "16px", borderRadius: "16px", marginBottom: "16px" }}>
-                                        <QRCodeSVG value={`http://192.168.43.52:3000/consumer/qr/${cropId}`} size={180} bgColor="white" fgColor="#014D4E" />
+                                    <QRCodeSVG value={`https://growise-rho.vercel.app/consumer/qr`} size={180} bgColor="white" fgColor="#014D4E" />
                                 </div>
                                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.25)", marginBottom: "16px" }}>growise.app/farm-story/{selected.id}</div>
                                 <div style={{ background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.15)", borderRadius: "10px", padding: "10px" }}>
