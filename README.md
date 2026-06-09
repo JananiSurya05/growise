@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GroWise 🌱
+
+An AI-powered agri-food platform connecting farmers, consumers, and government officials — built for Tamil Nadu.
+
+---
+
+## Frontend
+
+The frontend is built using **Next.js 16** with **React** and **TypeScript**. It is a responsive web application with role-based dashboards for farmers, consumers, and government officials.
+
+- **Farmer Portal** — Crop listing management, income calculator, sales analytics, weather advisories, AI crop advisor, and plant disease scanner.
+- **Consumer Portal** — Fresh produce marketplace, QR farm story (farm-to-table transparency), nutrition guide, and order tracking.
+- **Government Portal** — Analytics and oversight dashboard.
+
+---
+
+## Backend
+
+The backend uses **Supabase** — an open-source Firebase alternative — which provides a **PostgreSQL database**, real-time data sync, and user authentication. All data including farmer profiles, crop listings, and orders are stored and retrieved through Supabase.
+
+---
+
+## AI / ML
+
+For disease detection, we implemented an **AI-powered image classification system**. The model analyses crop images and identifies diseases based on visual patterns such as leaf discoloration, spots, and texture changes. It then provides treatment recommendations in real time.
+
+We evaluated both approaches — training a custom CNN model and using a pre-trained vision model. Training a custom model requires 50,000+ labeled crop disease images and weeks of GPU training. We chose to integrate a **pre-trained vision model** fine-tuned for agricultural use, which gives higher accuracy immediately. This reflects real-world industry practice where pre-trained models are preferred over custom models for production systems.
+
+The **AI Crop Advisor** uses the same model pipeline to answer farmer queries in natural language, with guidance tailored to Indian agricultural contexts.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, React 19, TypeScript |
+| Styling | Tailwind CSS v4 |
+| Backend / Database | Supabase (PostgreSQL) |
+| AI / ML | Pre-trained vision model (agricultural fine-tuned) |
+| Weather | OpenWeather API |
+| QR Codes | qrcode, qrcode.react |
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to view the app.

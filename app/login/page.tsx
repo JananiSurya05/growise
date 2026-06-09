@@ -15,10 +15,8 @@ export default function Login() {
     const [quoteIndex, setQuoteIndex] = useState(0);
     const [fade, setFade] = useState(true);
     const [loading, setLoading] = useState<string | null>(null);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [showForm, setShowForm] = useState(false);
     const [selectedRole, setSelectedRole] = useState("");
+    const [showRoleSelect, setShowRoleSelect] = useState(false);
     const [typedText, setTypedText] = useState("");
     const [typewriterDone, setTypewriterDone] = useState(false);
     const [cardsVisible, setCardsVisible] = useState(false);
@@ -50,70 +48,90 @@ export default function Login() {
         return () => clearInterval(interval);
     }, []);
 
-    async function handleLogin() {
-        if (!name.trim() || !email.trim()) return;
+    async function handleGoogleLogin() {
+        if (!selectedRole) return;
         setLoading(selectedRole);
 
-        const { data: existing } = await supabase
-            .from("users")
-            .select("*")
-            .eq("email", email)
-            .single() as { data: any };
+        // Save role in cookie before redirect
+        document.cookie = `growise_pending_role=${selectedRole}; path=/`;
 
-        if (existing) {
-            localStorage.setItem("growise_user", JSON.stringify(existing));
-            window.location.href = `/${existing.role}`;
-            return;
-        }
-
-        const { data: newUser, error } = await supabase
-            .from("users")
-            .insert([{ name, email, role: selectedRole, location: "Tamil Nadu" }] as any)
-            .select()
-            .single() as { data: any, error: any };
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
 
         if (error) {
-            alert("Error: " + error.message);
+            alert("Google sign-in failed: " + error.message);
             setLoading(null);
-            return;
         }
-
-        localStorage.setItem("growise_user", JSON.stringify(newUser));
-        window.location.href = `/${selectedRole}`;
     }
 
     function pickRole(role: string) {
         setSelectedRole(role);
-        setShowForm(true);
+        setShowRoleSelect(true);
     }
+
+    const roleColors: Record<string, { color: string; border: string; bg: string }> = {
+        farmer: { color: "#4ade80", border: "rgba(74,222,128,0.3)", bg: "rgba(22,163,74,0.06)" },
+        consumer: { color: "#60a5fa", border: "rgba(96,165,250,0.3)", bg: "rgba(2,132,199,0.06)" },
+        government: { color: "#a78bfa", border: "rgba(167,139,250,0.3)", bg: "rgba(124,58,237,0.06)" },
+    };
+
+    const current = roleColors[selectedRole] || roleColors.farmer;
 
     return (
         <>
             <style>{`
-                @keyframes dropDown {
-                    0% { opacity: 0; transform: translateY(-60px); }
-                    60% { transform: translateY(8px); }
-                    100% { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes cursorBlink {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0; }
-                }
-                @keyframes subtitleFade {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 0.5; transform: translateY(0); }
-                }
-                .role-card {
-                    border-radius: 20px;
-                    overflow: hidden;
-                    cursor: pointer;
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                }
-                .role-card:hover {
-                    transform: translateY(-6px);
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                }
-            `}</style>
+        @keyframes dropDown {
+          0%   { opacity: 0; transform: translateY(-60px); }
+          60%  { transform: translateY(8px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cursorBlink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
+        }
+        @keyframes subtitleFade {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 0.5; transform: translateY(0); }
+        }
+        .role-card {
+          border-radius: 20px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .role-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .google-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          background: white;
+          border: none;
+          border-radius: 12px;
+          padding: 13px;
+          font-size: 14px;
+          font-weight: 700;
+          color: #1a1a1a;
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.1s ease;
+        }
+        .google-btn:hover {
+          background: #f1f5f9;
+          transform: translateY(-1px);
+        }
+        .google-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `}</style>
 
             <main style={{
                 minHeight: "100vh", background: "#014D4E",
@@ -123,11 +141,11 @@ export default function Login() {
                 padding: "32px 40px", position: "relative", overflow: "hidden",
             }}>
 
-                {/* Grid */}
+                {/* Grid background */}
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
                 <div style={{ position: "absolute", width: "600px", height: "600px", background: "radial-gradient(circle, rgba(74,222,128,0.06) 0%, transparent 70%)", top: "50%", left: "50%", transform: "translate(-50%,-50%)", pointerEvents: "none" }} />
 
-                {/* Animated Logo */}
+                {/* Logo */}
                 <div style={{ position: "relative", zIndex: 2, textAlign: "center", width: "100%" }}>
                     <a href="/" style={{ textDecoration: "none" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "6px" }}>
@@ -148,10 +166,10 @@ export default function Login() {
                     </a>
                 </div>
 
-                {/* Cards or Form */}
+                {/* Cards or Google Sign-in */}
                 <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "960px" }}>
 
-                    {!showForm ? (
+                    {!showRoleSelect ? (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
                             {[
                                 { role: "farmer", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=300&fit=crop", label: "Farmer", desc: "List crops, get AI advice, sell directly to consumers.", color: "#4ade80", border: "rgba(74,222,128,0.3)", bg: "rgba(22,163,74,0.06)", badge: "🌾 FOR FARMERS" },
@@ -172,7 +190,7 @@ export default function Login() {
                                 >
                                     <div style={{ position: "relative", height: "180px" }}>
                                         <img src={item.img} alt={item.role} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)` }} />
+                                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)" }} />
                                         <div style={{ position: "absolute", bottom: "12px", left: "16px", fontSize: "11px", fontWeight: "600", color: item.color, background: "rgba(0,0,0,0.4)", padding: "3px 10px", borderRadius: "999px", border: `1px solid ${item.border}` }}>
                                             {item.badge}
                                         </div>
@@ -189,48 +207,40 @@ export default function Login() {
                         </div>
                     ) : (
                         <div style={{ maxWidth: "420px", margin: "0 auto" }}>
-                            <div style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "32px" }}>
+                            <div style={{ background: "rgba(0,0,0,0.3)", border: `1px solid ${current.border}`, borderRadius: "20px", padding: "32px" }}>
                                 <div style={{ fontSize: "16px", fontWeight: "700", color: "white", marginBottom: "4px", textAlign: "center" }}>
-                                    {selectedRole === "farmer" ? "🌾" : selectedRole === "consumer" ? "🛒" : "🏛️"} Enter as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
+                                    {selectedRole === "farmer" ? "🌾" : selectedRole === "consumer" ? "🛒" : "🏛️"} Sign in as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
                                 </div>
-                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: "24px" }}>
-                                    Enter your details to continue
-                                </div>
-
-                                <div style={{ marginBottom: "14px" }}>
-                                    <label style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginBottom: "6px", display: "block" }}>Your Name</label>
-                                    <input
-                                        value={name}
-                                        onChange={e => setName(e.target.value)}
-                                        placeholder="e.g. Ravi Kumar"
-                                        style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif", boxSizing: "border-box" }}
-                                    />
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: "28px" }}>
+                                    Use your Google account to continue
                                 </div>
 
-                                <div style={{ marginBottom: "20px" }}>
-                                    <label style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginBottom: "6px", display: "block" }}>Email Address</label>
-                                    <input
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        placeholder="e.g. ravi@gmail.com"
-                                        type="email"
-                                        style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif", boxSizing: "border-box" }}
-                                    />
-                                </div>
-
-                                <button onClick={handleLogin} disabled={!!loading} style={{
-                                    width: "100%", background: loading ? "rgba(74,222,128,0.3)" : "#4ade80",
-                                    border: "none", borderRadius: "12px", padding: "13px",
-                                    fontSize: "14px", fontWeight: "700",
-                                    color: loading ? "#4ade80" : "#0a0a0a",
-                                    cursor: loading ? "not-allowed" : "pointer"
-                                }}>
-                                    {loading ? "Signing in..." : "Continue →"}
+                                {/* Google Sign In Button */}
+                                <button
+                                    className="google-btn"
+                                    onClick={handleGoogleLogin}
+                                    disabled={!!loading}
+                                >
+                                    {/* Google SVG icon */}
+                                    <svg width="18" height="18" viewBox="0 0 48 48">
+                                        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z" />
+                                        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+                                        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.5 35.6 26.9 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.5 5C9.8 40 16.4 44 24 44z" />
+                                        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.4-2.5 4.4-4.6 5.8l6.2 5.2C40.7 35.7 44 30.3 44 24c0-1.3-.1-2.7-.4-4z" />
+                                    </svg>
+                                    {loading ? "Redirecting to Google..." : "Continue with Google"}
                                 </button>
 
-                                <button onClick={() => setShowForm(false)} style={{ width: "100%", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "10px", fontSize: "13px", color: "rgba(255,255,255,0.4)", cursor: "pointer", marginTop: "10px" }}>
+                                <button
+                                    onClick={() => setShowRoleSelect(false)}
+                                    style={{ width: "100%", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "10px", fontSize: "13px", color: "rgba(255,255,255,0.4)", cursor: "pointer", marginTop: "10px" }}
+                                >
                                     ← Back
                                 </button>
+
+                                <div style={{ marginTop: "16px", fontSize: "11px", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
+                                    By continuing, you agree to GroWise's terms of service
+                                </div>
                             </div>
                         </div>
                     )}
