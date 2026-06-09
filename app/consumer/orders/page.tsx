@@ -8,7 +8,6 @@ export default function MyOrders() {
     const [orders, setOrders] = useState<any[]>([]);
     const [selected, setSelected] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
         loadOrders();
@@ -17,18 +16,35 @@ export default function MyOrders() {
     async function loadOrders() {
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (!authUser) { window.location.href = "/login"; return; }
-        setUser(authUser);
 
-        const { data } = await supabase
+        const { data: ordersData } = await supabase
             .from("orders")
-            .select("*, crops(name, image_url, price), users!orders_farmer_id_fkey(name, location)")
+            .select("*")
             .eq("consumer_id", authUser.id)
             .order("created_at", { ascending: false }) as { data: any[] };
 
-        const result = data || [];
-        setOrders(result);
-        if (result.length > 0) setSelected(result[0]);
+        if (!ordersData) { setLoading(false); return; }
+
+        // Fetch order_items for each order
+        const ordersWithItems = await Promise.all(ordersData.map(async (order) => {
+            const { data: items } = await supabase
+                .from("order_items")
+                .select("*")
+                .eq("order_id", order.id) as { data: any[] };
+            return { ...order, items: items || [] };
+        }));
+
+        setOrders(ordersWithItems);
+        if (ordersWithItems.length > 0) setSelected(ordersWithItems[0]);
         setLoading(false);
+    }
+
+    async function deleteOrder(orderId: string) {
+        if (!confirm("Delete this order?")) return;
+        await supabase.from("order_items").delete().eq("order_id", orderId);
+        await supabase.from("orders").delete().eq("id", orderId);
+        setOrders(prev => prev.filter(o => o.id !== orderId));
+        if (selected?.id === orderId) setSelected(null);
     }
 
     function getStatus(status: string) {
@@ -40,7 +56,6 @@ export default function MyOrders() {
 
     const totalSpent = orders.reduce((a, o) => a + (o.total || 0), 0);
     const totalSaved = orders.reduce((a, o) => a + (o.amount_saved || 0), 0);
-    const farmerIds = new Set(orders.map(o => o.farmer_id));
 
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
@@ -97,14 +112,13 @@ export default function MyOrders() {
                 <div style={{ background: "linear-gradient(135deg, #012e2f, #013a3b)", border: "1px solid rgba(74,222,128,0.15)", borderRadius: "16px", padding: "18px 24px", marginBottom: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                         <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>🌱 Your Impact — Helping Real Farmers</div>
-                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Every rupee goes directly to the farmer. No middlemen. No markup.</div>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Every rupee goes directly to the farmer. No middlemen.</div>
                     </div>
                     <div style={{ display: "flex", gap: "32px" }}>
                         {[
                             { label: "Total Spent", value: `₹${totalSpent}`, color: "#60a5fa" },
                             { label: "Saved vs Supermarket", value: `₹${totalSaved}`, color: "#4ade80" },
                             { label: "Total Orders", value: orders.length, color: "#fbbf24" },
-                            { label: "Farmers Supported", value: farmerIds.size, color: "#a78bfa" },
                         ].map((s, i) => (
                             <div key={i} style={{ textAlign: "center" }}>
                                 <div style={{ fontSize: "20px", fontWeight: "800", color: s.color }}>{s.value}</div>
@@ -114,113 +128,111 @@ export default function MyOrders() {
                     </div>
                 </div>
 
-                {/* Loading */}
-                {loading && (
-                    <div style={{ textAlign: "center", padding: "60px", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
-                        Loading your orders...
-                    </div>
-                )}
+                {loading && <div style={{ textAlign: "center", padding: "60px", color: "rgba(255,255,255,0.4)" }}>Loading your orders...</div>}
 
-                {/* No orders */}
                 {!loading && orders.length === 0 && (
                     <div style={{ textAlign: "center", padding: "60px", background: "#012e2f", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.07)" }}>
                         <div style={{ fontSize: "48px", marginBottom: "16px" }}>📦</div>
                         <div style={{ fontSize: "18px", fontWeight: "700", color: "white", marginBottom: "8px" }}>No orders yet!</div>
-                        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginBottom: "20px" }}>Start shopping fresh produce from Tamil Nadu farmers.</div>
                         <a href="/consumer/shop" style={{ textDecoration: "none" }}>
-                            <div style={{ background: "#4ade80", color: "#0a0a0a", borderRadius: "12px", padding: "12px 28px", fontSize: "14px", fontWeight: "700", display: "inline-block" }}>
-                                Shop Now →
-                            </div>
+                            <div style={{ background: "#4ade80", color: "#0a0a0a", borderRadius: "12px", padding: "12px 28px", fontSize: "14px", fontWeight: "700", display: "inline-block", marginTop: "12px" }}>Shop Now →</div>
                         </a>
                     </div>
                 )}
 
-                {/* Real orders */}
                 {!loading && orders.length > 0 && (
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: "20px" }}>
 
                         {/* Orders list */}
-                        <div style={{ position: "relative" }}>
-                            <div style={{ position: "absolute", left: "18px", top: "24px", bottom: "24px", width: "2px", background: "rgba(255,255,255,0.05)" }} />
-                            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                                {orders.map((order) => {
-                                    const st = getStatus(order.status);
-                                    const isSelected = selected?.id === order.id;
-                                    const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-                                    return (
-                                        <div key={order.id} style={{ display: "flex", gap: "16px", position: "relative", zIndex: 1 }}>
-                                            <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: isSelected ? st.bg : "rgba(0,0,0,0.3)", border: `2px solid ${isSelected ? st.color : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>
-                                                {st.icon}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                            {orders.map((order) => {
+                                const st = getStatus(order.status);
+                                const isSelected = selected?.id === order.id;
+                                const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+                                const itemNames = order.items.length > 0
+                                    ? order.items.map((i: any) => i.crop_name).join(", ")
+                                    : "Order";
+
+                                return (
+                                    <div key={order.id} style={{ display: "flex", gap: "16px" }}>
+                                        <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: isSelected ? st.bg : "rgba(0,0,0,0.3)", border: `2px solid ${isSelected ? st.color : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>
+                                            {st.icon}
+                                        </div>
+                                        <div onClick={() => setSelected(order)} style={{ flex: 1, background: isSelected ? "rgba(96,165,250,0.05)" : "#012e2f", border: isSelected ? "2px solid rgba(96,165,250,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px 16px", cursor: "pointer", position: "relative" }}>
+
+                                            {/* Delete button */}
+                                            <button onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }} style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", padding: "3px 10px", color: "#f87171", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}>✕ Delete</button>
+
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", paddingRight: "70px" }}>
+                                                <div>
+                                                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "2px" }}>Order #{order.id?.slice(0, 8)}</div>
+                                                    <div style={{ fontSize: "14px", fontWeight: "700", color: "white" }}>{itemNames}</div>
+                                                </div>
+                                                <div style={{ textAlign: "right" }}>
+                                                    <div style={{ fontSize: "18px", fontWeight: "800", color: "white", marginBottom: "4px" }}>₹{order.total || 0}</div>
+                                                    <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 10px", borderRadius: "999px", color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>{st.icon} {order.status}</div>
+                                                </div>
                                             </div>
-                                            <div onClick={() => setSelected(order)} style={{ flex: 1, background: isSelected ? "rgba(96,165,250,0.05)" : "#012e2f", border: isSelected ? "2px solid rgba(96,165,250,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px 16px", cursor: "pointer" }}>
-                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                                                    <div>
-                                                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "2px" }}>Order #{order.id?.slice(0, 8)}</div>
-                                                        <div style={{ fontSize: "14px", fontWeight: "700", color: "white" }}>{order.crops?.name || "Product"}</div>
-                                                    </div>
-                                                    <div style={{ textAlign: "right" }}>
-                                                        <div style={{ fontSize: "18px", fontWeight: "800", color: "white", marginBottom: "4px" }}>₹{order.total || 0}</div>
-                                                        <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 10px", borderRadius: "999px", color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>{st.icon} {order.status}</div>
-                                                    </div>
+
+                                            {/* Items summary */}
+                                            {order.items.length > 0 && (
+                                                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
+                                                    {order.items.map((item: any, i: number) => (
+                                                        <div key={i} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px", padding: "3px 8px", fontSize: "10px", color: "rgba(255,255,255,0.6)" }}>
+                                                            {item.crop_name} × {item.quantity}kg = ₹{item.total}
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-                                                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>🗓️ {date}</div>
-                                                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>👨‍🌾 {order.users?.name || "Farmer"}</div>
-                                                    {order.amount_saved > 0 && <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600" }}>💰 Saved ₹{order.amount_saved}</div>}
-                                                </div>
-                                                {/* Progress bar */}
-                                                <div style={{ marginTop: "10px", display: "flex", alignItems: "center" }}>
-                                                    {steps.map((step, i) => {
-                                                        const curr = steps.findIndex(s => s.toLowerCase() === (order.status || "").toLowerCase());
-                                                        const done = i <= curr;
-                                                        return (
-                                                            <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
-                                                                <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: done ? st.color : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
-                                                                {i < 3 && <div style={{ flex: 1, height: "2px", background: i < curr ? st.color : "rgba(255,255,255,0.06)" }} />}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-                                                    {steps.map((step, i) => {
-                                                        const curr = steps.findIndex(s => s.toLowerCase() === (order.status || "").toLowerCase());
-                                                        return <div key={i} style={{ fontSize: "8px", color: i <= curr ? st.color : "rgba(255,255,255,0.2)" }}>{step}</div>;
-                                                    })}
-                                                </div>
+                                            )}
+
+                                            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>🗓️ {date}</div>
+                                                {order.amount_saved > 0 && <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600" }}>💰 Saved ₹{order.amount_saved}</div>}
+                                            </div>
+
+                                            {/* Progress bar */}
+                                            <div style={{ marginTop: "10px", display: "flex", alignItems: "center" }}>
+                                                {steps.map((step, i) => {
+                                                    const curr = steps.findIndex(s => s.toLowerCase() === (order.status || "").toLowerCase());
+                                                    const done = i <= curr;
+                                                    return (
+                                                        <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                                                            <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: done ? st.color : "rgba(255,255,255,0.08)", flexShrink: 0 }} />
+                                                            {i < 3 && <div style={{ flex: 1, height: "2px", background: i < curr ? st.color : "rgba(255,255,255,0.06)" }} />}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+                                                {steps.map((step, i) => {
+                                                    const curr = steps.findIndex(s => s.toLowerCase() === (order.status || "").toLowerCase());
+                                                    return <div key={i} style={{ fontSize: "8px", color: i <= curr ? st.color : "rgba(255,255,255,0.2)" }}>{step}</div>;
+                                                })}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Detail panel */}
                         {selected && (
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px", position: "sticky", top: "24px", height: "fit-content" }}>
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", overflow: "hidden" }}>
-                                    <div style={{ position: "relative", height: "100px" }}>
-                                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=200&fit=crop" alt="farm" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,46,47,0.95), rgba(0,0,0,0.4))" }} />
-                                        <div style={{ position: "absolute", inset: 0, padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
-                                            <div style={{ width: "52px", height: "52px", borderRadius: "12px", background: "rgba(74,222,128,0.2)", border: "2px solid rgba(74,222,128,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>👨‍🌾</div>
-                                            <div>
-                                                <div style={{ fontSize: "15px", fontWeight: "700", color: "white" }}>{selected.users?.name || "Farmer"}</div>
-                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>📍 {selected.users?.location || "Tamil Nadu"}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
-                                    <div style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".06em" }}>🛒 Items in this Order</div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "8px 0" }}>
-                                        <img src={selected.crops?.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=80&h=80&fit=crop"} alt={selected.crops?.name} style={{ width: "36px", height: "36px", borderRadius: "8px", objectFit: "cover" }} />
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>{selected.crops?.name || "Product"}</div>
-                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{selected.quantity || 1}kg × ₹{selected.crops?.price || 0}/kg</div>
+                                {/* Bill Summary */}
+                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "16px" }}>
+                                    <div style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🛒 Items in this Order</div>
+                                    {selected.items.length > 0 ? selected.items.map((item: any, i: number) => (
+                                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < selected.items.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                                            <div>
+                                                <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>{item.crop_name}</div>
+                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{item.quantity}kg × ₹{item.price}/kg</div>
+                                            </div>
+                                            <div style={{ fontSize: "14px", fontWeight: "700", color: "#4ade80" }}>₹{item.total}</div>
                                         </div>
-                                        <div style={{ fontSize: "14px", fontWeight: "700", color: "#4ade80" }}>₹{selected.total || 0}</div>
-                                    </div>
+                                    )) : (
+                                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>No items found</div>
+                                    )}
                                 </div>
 
                                 <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
@@ -242,20 +254,37 @@ export default function MyOrders() {
                                     </div>
                                     {selected.amount_saved > 0 && (
                                         <div style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", borderRadius: "10px", padding: "10px 12px", marginTop: "8px" }}>
-                                            <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", marginBottom: "2px" }}>💰 You saved ₹{selected.amount_saved} on this order</div>
-                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>vs buying from a supermarket</div>
+                                            <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600" }}>💰 You saved ₹{selected.amount_saved} vs supermarket!</div>
                                         </div>
                                     )}
                                 </div>
 
-                                <div style={{ display: "flex", gap: "8px" }}>
-                                    <a href="/consumer/qr" style={{ textDecoration: "none", flex: 1 }}>
-                                        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px", textAlign: "center", fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>📱 Farm Story</div>
-                                    </a>
-                                    <a href="/consumer/shop" style={{ textDecoration: "none", flex: 1 }}>
-                                        <div style={{ background: "linear-gradient(135deg, #0284c7, #0369a1)", borderRadius: "10px", padding: "10px", textAlign: "center", fontSize: "12px", color: "white", fontWeight: "700" }}>🔄 Reorder</div>
-                                    </a>
+                                {/* Tracking */}
+                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
+                                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🚚 Order Tracking</div>
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        {steps.map((step, i) => {
+                                            const curr = steps.findIndex(s => s.toLowerCase() === (selected.status || "").toLowerCase());
+                                            const done = i <= curr;
+                                            const st = getStatus(selected.status);
+                                            return (
+                                                <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                                                    <div style={{ textAlign: "center", flex: 1 }}>
+                                                        <div style={{ width: "26px", height: "26px", borderRadius: "50%", background: done ? st.color : "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px", fontSize: "10px", color: done ? "#0a0a0a" : "rgba(255,255,255,0.3)", fontWeight: "700" }}>
+                                                            {done ? "✓" : i + 1}
+                                                        </div>
+                                                        <div style={{ fontSize: "9px", color: done ? st.color : "rgba(255,255,255,0.25)" }}>{step}</div>
+                                                    </div>
+                                                    {i < 3 && <div style={{ height: "2px", flex: 1, background: i < curr ? st.color : "rgba(255,255,255,0.06)", marginBottom: "16px" }} />}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
+
+                                <a href="/consumer/shop" style={{ textDecoration: "none" }}>
+                                    <div style={{ background: "linear-gradient(135deg, #0284c7, #0369a1)", borderRadius: "10px", padding: "12px", textAlign: "center", fontSize: "13px", color: "white", fontWeight: "700" }}>🔄 Order Again</div>
+                                </a>
                             </div>
                         )}
                     </div>

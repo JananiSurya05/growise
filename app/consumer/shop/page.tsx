@@ -14,20 +14,20 @@ type Product = {
     img: string;
     badge: string;
     rating: number;
-    reviews: number;
-    freshness: string;
-    delivery: string;
 };
+
+type CartItem = Product & { qty: number };
 
 export default function ConsumerShop() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [cart, setCart] = useState<any[]>([]);
+    const [cart, setCart] = useState<CartItem[]>([]);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("All");
-    const [added, setAdded] = useState<any>(null);
-    const [selected, setSelected] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [authUser, setAuthUser] = useState<any>(null);
+    const [showCart, setShowCart] = useState(false);
+    const [placing, setPlacing] = useState(false);
+    const [ordered, setOrdered] = useState(false);
 
     useEffect(() => {
         async function init() {
@@ -59,44 +59,86 @@ export default function ConsumerShop() {
                 img: c.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
                 badge: c.badge || "🌿 Eco",
                 rating: 4.8,
-                reviews: Math.floor(Math.random() * 200) + 20,
-                freshness: "Harvested recently",
-                delivery: "Tomorrow",
             })));
         }
         setLoading(false);
     }
 
-    async function addToCart(product: Product) {
-        if (!authUser) { window.location.href = "/login"; return; }
+    function addToCart(product: Product) {
+        setCart(prev => {
+            const existing = prev.find(i => i.id === product.id);
+            if (existing) {
+                return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+            }
+            return [...prev, { ...product, qty: 1 }];
+        });
+        setShowCart(true);
+    }
 
-        setCart(prev => [...prev, product.id]);
-        setAdded(product.id);
-        setTimeout(() => setAdded(null), 1500);
+    function removeFromCart(id: any) {
+        setCart(prev => prev.filter(i => i.id !== id));
+    }
 
-        const { error } = await supabase.from("orders").insert([{
+    function updateQty(id: any, qty: number) {
+        if (qty < 1) { removeFromCart(id); return; }
+        setCart(prev => prev.map(i => i.id === id ? { ...i, qty } : i));
+    }
+
+    async function placeOrder() {
+        if (!authUser || cart.length === 0) return;
+        setPlacing(true);
+
+        const grandTotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        const grandSaved = cart.reduce((sum, i) => sum + (i.marketPrice - i.price) * i.qty, 0);
+
+        // Create one order
+        const { data: orderData, error } = await supabase.from("orders").insert([{
             consumer_id: authUser.id,
-            farmer_id: product.farmer_id,
-            crop_id: product.id,
-            quantity: 1,
-            total: product.price,
-            amount_saved: product.marketPrice - product.price,
+            farmer_id: cart[0].farmer_id,
+            crop_id: cart[0].id,
+            quantity: cart.reduce((sum, i) => sum + i.qty, 0),
+            total: grandTotal,
+            amount_saved: grandSaved,
             status: "Processing",
-        }] as any);
+        }] as any).select().single() as any;
 
         if (error) {
-            console.error("Order error:", error.message);
             alert("Could not place order: " + error.message);
+            setPlacing(false);
+            return;
         }
+
+        // Save all items to order_items
+        for (const item of cart) {
+            await supabase.from("order_items").insert([{
+                order_id: orderData.id,
+                crop_id: item.id,
+                crop_name: item.name,
+                quantity: item.qty,
+                price: item.price,
+                total: item.price * item.qty,
+            }] as any);
+        }
+
+        setCart([]);
+        setPlacing(false);
+        setOrdered(true);
+        setTimeout(() => {
+            setOrdered(false);
+            setShowCart(false);
+            window.location.href = "/consumer/orders";
+        }, 2000);
     }
 
     const filtered = products.filter(p => {
         const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-            p.farmer.toLowerCase().includes(search.toLowerCase()) ||
             p.location.toLowerCase().includes(search.toLowerCase());
         const matchFilter = filter === "All" || p.badge.includes(filter);
         return matchSearch && matchFilter;
     });
+
+    const totalAmount = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const totalSaved = cart.reduce((sum, i) => sum + (i.marketPrice - i.price) * i.qty, 0);
 
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
@@ -135,74 +177,103 @@ export default function ConsumerShop() {
             {/* Main */}
             <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
 
+                {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
                             <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
-                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", letterSpacing: ".06em" }}>LIVE · {products.length} PRODUCTS FROM REAL FARMERS</span>
+                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", letterSpacing: ".06em" }}>LIVE · {products.length} PRODUCTS</span>
                         </div>
                         <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white" }}>🥦 Fresh Produce Shop</h1>
                     </div>
-                    <a href="/consumer/orders" style={{ textDecoration: "none" }}>
-                        <div style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: "10px", padding: "8px 16px", fontSize: "13px", color: "#60a5fa", fontWeight: "600", cursor: "pointer" }}>
-                            🛒 Cart ({cart.length}) → View Orders
-                        </div>
-                    </a>
-                </div>
-
-                {/* Banner */}
-                <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", marginBottom: "20px", height: "100px" }}>
-                    <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=1200&h=300&fit=crop" alt="fresh produce" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,77,78,0.97) 0%, rgba(0,0,0,0.5) 100%)" }} />
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px" }}>
-                        <div>
-                            <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", marginBottom: "4px" }}>REAL FARMERS · REAL FOOD · REAL PRICES</div>
-                            <div style={{ fontSize: "18px", fontWeight: "800", color: "white" }}>Fresh from Tamil Nadu farms — direct to you</div>
-                        </div>
-                        <div style={{ display: "flex", gap: "28px" }}>
-                            {[
-                                { label: "Live Products", value: products.length, color: "#4ade80" },
-                                { label: "No Middlemen", value: "0", color: "#60a5fa" },
-                                { label: "Platform Fee", value: "₹0", color: "#fbbf24" },
-                            ].map((s, i) => (
-                                <div key={i} style={{ textAlign: "center" }}>
-                                    <div style={{ fontSize: "18px", fontWeight: "700", color: s.color }}>{s.value}</div>
-                                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
-                                </div>
-                            ))}
-                        </div>
+                    <div onClick={() => setShowCart(!showCart)} style={{ background: cart.length > 0 ? "rgba(74,222,128,0.15)" : "rgba(96,165,250,0.1)", border: cart.length > 0 ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(96,165,250,0.25)", borderRadius: "10px", padding: "8px 16px", fontSize: "13px", color: cart.length > 0 ? "#4ade80" : "#60a5fa", fontWeight: "600", cursor: "pointer" }}>
+                        🛒 Cart ({cart.length}) {cart.length > 0 ? "→" : ""}
                     </div>
                 </div>
 
+                {/* Cart Panel */}
+                {showCart && (
+                    <div style={{ background: "#012e2f", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "16px", padding: "20px", marginBottom: "20px" }}>
+                        <div style={{ fontSize: "13px", color: "#4ade80", fontWeight: "700", marginBottom: "14px" }}>🛒 Your Cart</div>
+
+                        {cart.length === 0 ? (
+                            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", textAlign: "center", padding: "16px" }}>Cart is empty — add some veggies! 🥦</div>
+                        ) : (
+                            <>
+                                {cart.map((item, i) => (
+                                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                        <img src={item.img} alt={item.name} style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover" }} />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>{item.name}</div>
+                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>₹{item.price}/kg</div>
+                                        </div>
+                                        {/* Qty controls */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <button onClick={() => updateQty(item.id, item.qty - 1)} style={{ width: "24px", height: "24px", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "white", cursor: "pointer", fontSize: "14px" }}>-</button>
+                                            <span style={{ fontSize: "13px", color: "white", minWidth: "20px", textAlign: "center" }}>{item.qty}</span>
+                                            <button onClick={() => updateQty(item.id, item.qty + 1)} style={{ width: "24px", height: "24px", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "white", cursor: "pointer", fontSize: "14px" }}>+</button>
+                                        </div>
+                                        <div style={{ fontSize: "13px", fontWeight: "700", color: "#60a5fa", minWidth: "50px", textAlign: "right" }}>₹{item.price * item.qty}</div>
+                                        {/* Discard button */}
+                                        <button onClick={() => removeFromCart(item.id)} style={{ background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "8px", padding: "4px 10px", color: "#f87171", fontSize: "11px", fontWeight: "600", cursor: "pointer" }}>
+                                            ✕ Remove
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {/* Total */}
+                                <div style={{ marginTop: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Total: <span style={{ color: "white", fontWeight: "700" }}>₹{totalAmount}</span></div>
+                                        <div style={{ fontSize: "11px", color: "#4ade80" }}>You save ₹{totalSaved} vs supermarket!</div>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "8px" }}>
+                                        <button onClick={() => setCart([])} style={{ background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "10px", padding: "10px 16px", color: "#f87171", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>
+                                            🗑️ Clear All
+                                        </button>
+                                        <button onClick={placeOrder} disabled={placing || ordered} style={{ background: ordered ? "#16a34a" : "#4ade80", border: "none", borderRadius: "10px", padding: "10px 20px", color: "#0a0a0a", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}>
+                                            {ordered ? "✅ Order Placed!" : placing ? "Placing..." : "Place Order →"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
                 {/* Search + filters */}
                 <div style={{ display: "flex", gap: "12px", marginBottom: "20px", alignItems: "center" }}>
-                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search by crop, farmer or location..." style={{ flex: 1, background: "#012e2f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px 16px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif" }} />
+                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search by crop or location..." style={{ flex: 1, background: "#012e2f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px 16px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif" }} />
                     <div style={{ display: "flex", gap: "6px" }}>
                         {["All", "Eco", "Top", "New"].map(f => (
-                            <button key={f} onClick={() => setFilter(f)} style={{ background: filter === f ? "rgba(96,165,250,0.2)" : "rgba(255,255,255,0.04)", border: filter === f ? "1px solid rgba(96,165,250,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: "999px", padding: "7px 14px", fontSize: "12px", color: filter === f ? "#60a5fa" : "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Segoe UI', sans-serif", fontWeight: filter === f ? "600" : "400" }}>{f}</button>
+                            <button key={f} onClick={() => setFilter(f)} style={{ background: filter === f ? "rgba(96,165,250,0.2)" : "rgba(255,255,255,0.04)", border: filter === f ? "1px solid rgba(96,165,250,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: "999px", padding: "7px 14px", fontSize: "12px", color: filter === f ? "#60a5fa" : "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Segoe UI', sans-serif" }}>{f}</button>
                         ))}
                     </div>
                 </div>
 
+                {/* Products grid */}
                 {loading ? (
-                    <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>Loading fresh produce from farmers...</div>
+                    <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)" }}>Loading fresh produce...</div>
                 ) : filtered.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "48px", background: "#012e2f", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
                         <div style={{ fontSize: "48px", marginBottom: "16px" }}>🥦</div>
-                        <div style={{ fontSize: "16px", fontWeight: "600", color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>No products yet</div>
-                        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>Farmers haven't listed any crops yet. Check back soon!</div>
+                        <div style={{ fontSize: "16px", color: "rgba(255,255,255,0.5)" }}>No products yet</div>
                     </div>
                 ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: selected ? "1fr 320px" : "1fr", gap: "20px" }}>
-                        <div style={{ display: "grid", gridTemplateColumns: selected ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: "12px", alignContent: "start" }}>
-                            {filtered.map((product) => (
-                                <div key={product.id} onClick={() => setSelected(selected?.id === product.id ? null : product)} style={{ background: selected?.id === product.id ? "rgba(96,165,250,0.06)" : "#012e2f", border: selected?.id === product.id ? "2px solid rgba(96,165,250,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
+                        {filtered.map((product) => {
+                            const inCart = cart.find(i => i.id === product.id);
+                            return (
+                                <div key={product.id} style={{ background: "#012e2f", border: inCart ? "2px solid rgba(74,222,128,0.4)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden" }}>
                                     <div style={{ position: "relative", height: "110px" }}>
                                         <img src={product.img} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(1,46,47,0.85) 0%, transparent 55%)" }} />
                                         <div style={{ position: "absolute", top: "8px", left: "8px" }}>
                                             <div style={{ background: "rgba(0,0,0,0.65)", borderRadius: "999px", padding: "2px 8px", fontSize: "9px", color: "#4ade80", fontWeight: "600" }}>{product.badge}</div>
                                         </div>
+                                        {inCart && (
+                                            <div style={{ position: "absolute", top: "8px", right: "8px", background: "#4ade80", borderRadius: "999px", padding: "2px 8px", fontSize: "9px", color: "#0a0a0a", fontWeight: "700" }}>✓ {inCart.qty} in cart</div>
+                                        )}
                                         <div style={{ position: "absolute", bottom: "6px", left: "10px" }}>
                                             <div style={{ fontSize: "13px", fontWeight: "700", color: "white" }}>{product.name}</div>
                                         </div>
@@ -212,69 +283,14 @@ export default function ConsumerShop() {
                                             <div style={{ fontSize: "16px", fontWeight: "800", color: "#60a5fa" }}>₹{product.price}/kg</div>
                                             <div style={{ fontSize: "10px", color: "#f87171", textDecoration: "line-through" }}>₹{product.marketPrice}</div>
                                         </div>
-                                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>👨‍🌾 {product.farmer} · 📍 {product.location}</div>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                                            <div style={{ fontSize: "10px", color: "#fbbf24" }}>⭐ {product.rating}</div>
-                                            <div style={{ fontSize: "10px", color: "#4ade80", fontWeight: "600" }}>Save ₹{product.marketPrice - product.price}/kg</div>
-                                        </div>
-                                        <button onClick={e => { e.stopPropagation(); addToCart(product); }} style={{ width: "100%", border: "none", borderRadius: "8px", padding: "8px", fontSize: "11px", fontWeight: "700", cursor: "pointer", background: added === product.id ? "linear-gradient(135deg, #16a34a, #15803d)" : "linear-gradient(135deg, #0284c7, #0369a1)", color: "white" }}>
-                                            {added === product.id ? "✅ Added!" : "Add to Cart →"}
+                                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>📍 {product.location}</div>
+                                        <button onClick={() => addToCart(product)} style={{ width: "100%", border: "none", borderRadius: "8px", padding: "8px", fontSize: "11px", fontWeight: "700", cursor: "pointer", background: inCart ? "linear-gradient(135deg, #16a34a, #15803d)" : "linear-gradient(135deg, #0284c7, #0369a1)", color: "white" }}>
+                                            {inCart ? `✅ Add More (${inCart.qty})` : "Add to Cart →"}
                                         </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-
-                        {selected && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                                <div style={{ borderRadius: "14px", overflow: "hidden", position: "relative", height: "160px" }}>
-                                    <img src={selected.img} alt={selected.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(1,46,47,0.95) 0%, rgba(0,0,0,0.2) 60%)" }} />
-                                    <div style={{ position: "absolute", bottom: "14px", left: "14px", right: "14px" }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                                            <div>
-                                                <div style={{ fontSize: "20px", fontWeight: "800", color: "white", marginBottom: "2px" }}>{selected.name}</div>
-                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>📍 {selected.location}</div>
-                                            </div>
-                                            <div style={{ fontSize: "22px", fontWeight: "800", color: "#60a5fa" }}>₹{selected.price}/kg</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
-                                    <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".06em" }}>💰 Price Breakdown</div>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
-                                        <div style={{ background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
-                                            <div style={{ fontSize: "20px", fontWeight: "800", color: "#60a5fa" }}>₹{selected.price}</div>
-                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>GroWise price</div>
-                                        </div>
-                                        <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
-                                            <div style={{ fontSize: "20px", fontWeight: "800", color: "#f87171", textDecoration: "line-through" }}>₹{selected.marketPrice}</div>
-                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>Supermarket price</div>
-                                        </div>
-                                    </div>
-                                    <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
-                                        <div style={{ fontSize: "16px", fontWeight: "800", color: "#4ade80" }}>You save ₹{selected.marketPrice - selected.price}/kg!</div>
-                                    </div>
-                                </div>
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
-                                    <div style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".06em" }}>📋 Product Details</div>
-                                    {[
-                                        { label: "Farmer", value: selected.farmer, icon: "👨‍🌾" },
-                                        { label: "Location", value: selected.location, icon: "📍" },
-                                        { label: "Stock", value: `${selected.quantity}kg`, icon: "📦" },
-                                        { label: "Rating", value: `⭐ ${selected.rating}`, icon: "⭐" },
-                                    ].map((d, i) => (
-                                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{d.icon} {d.label}</span>
-                                            <span style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{d.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button onClick={() => addToCart(selected)} style={{ border: "none", borderRadius: "10px", padding: "12px", fontSize: "13px", fontWeight: "700", cursor: "pointer", background: added === selected.id ? "linear-gradient(135deg, #16a34a, #15803d)" : "linear-gradient(135deg, #0284c7, #0369a1)", color: "white" }}>
-                                    {added === selected.id ? "✅ Added to Cart!" : "🛒 Add to Cart →"}
-                                </button>
-                            </div>
-                        )}
+                            );
+                        })}
                     </div>
                 )}
             </div>
