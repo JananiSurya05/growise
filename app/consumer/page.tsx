@@ -1,4 +1,82 @@
+"use client";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+
 export default function ConsumerDashboard() {
+    const [user, setUser] = useState<any>(null);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [stats, setStats] = useState({ totalOrders: 0, totalSaved: 0, totalFarmers: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadData() {
+            // Get logged in user
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (!authUser) {
+                window.location.href = "/login";
+                return;
+            }
+
+            // Get user profile from users table
+            const { data: profile } = await supabase
+                .from("users")
+                .select("*")
+                .eq("id", authUser.id)
+                .single();
+
+            setUser(profile || {
+                name: authUser.user_metadata?.full_name || authUser.email,
+                email: authUser.email,
+                location: "Tamil Nadu"
+            });
+
+            // Get recent orders
+            const { data: orderData } = await supabase
+                .from("orders")
+                .select("*")
+                .eq("consumer_id", authUser.id)
+                .order("created_at", { ascending: false })
+                .limit(3);
+
+            setOrders(orderData || []);
+
+            // Get stats
+            const { data: allOrders } = await supabase
+                .from("orders")
+                .select("*")
+                .eq("consumer_id", authUser.id);
+
+            if (allOrders) {
+                const totalSaved = allOrders.reduce((sum: number, o: any) => sum + (o.amount_saved || 0), 0);
+                const farmerIds = new Set(allOrders.map((o: any) => o.farmer_id));
+                setStats({
+                    totalOrders: allOrders.length,
+                    totalSaved,
+                    totalFarmers: farmerIds.size,
+                });
+            }
+
+            setLoading(false);
+        }
+
+        loadData();
+    }, []);
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        window.location.href = "/login";
+    }
+
+    const firstName = user?.name?.split(" ")[0] || "there";
+    const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+    const statusColor: Record<string, string> = {
+        delivered: "#4ade80",
+        "on the way": "#fbbf24",
+        processing: "#60a5fa",
+        cancelled: "#f87171",
+    };
+
     return (
         <main style={{
             minHeight: "100vh",
@@ -31,13 +109,18 @@ export default function ConsumerDashboard() {
 
                 {/* Profile */}
                 <div style={{ marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                    <img
-                        src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=80&h=80&fit=crop"
-                        alt="consumer"
-                        style={{ width: "40px", height: "40px", borderRadius: "10px", objectFit: "cover", marginBottom: "8px", border: "2px solid rgba(96,165,250,0.3)" }}
-                    />
-                    <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>Priya Singh</div>
-                    <div style={{ fontSize: "11px", color: "#60a5fa" }}>● Online · Chennai</div>
+                    <div style={{
+                        width: "40px", height: "40px", borderRadius: "10px",
+                        background: "rgba(96,165,250,0.2)", border: "2px solid rgba(96,165,250,0.3)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "18px", marginBottom: "8px"
+                    }}>
+                        {loading ? "..." : (user?.name?.[0]?.toUpperCase() || "U")}
+                    </div>
+                    <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>
+                        {loading ? "Loading..." : (user?.name || user?.email || "User")}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#60a5fa" }}>● Online · {user?.location || "Tamil Nadu"}</div>
                 </div>
 
                 {/* Nav */}
@@ -67,12 +150,12 @@ export default function ConsumerDashboard() {
                     ))}
                 </nav>
 
-                <a href="/login" style={{ textDecoration: "none" }}>
+                <div onClick={handleLogout} style={{ textDecoration: "none", cursor: "pointer" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 10px", borderRadius: "9px", marginTop: "8px" }}>
                         <span style={{ fontSize: "15px" }}>🚪</span>
                         <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
                     </div>
-                </a>
+                </div>
             </div>
 
             {/* Main */}
@@ -82,16 +165,16 @@ export default function ConsumerDashboard() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                         <h1 style={{ fontSize: "22px", fontWeight: "700", color: "white", marginBottom: "3px" }}>
-                            Welcome back, Priya! 👋
+                            Welcome back, {loading ? "..." : firstName}! 👋
                         </h1>
-                        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Monday, 19 May 2026 · Chennai</p>
+                        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{today}</p>
                     </div>
                     <div style={{
                         background: "rgba(96,165,250,0.1)",
                         border: "1px solid rgba(96,165,250,0.25)",
                         borderRadius: "10px", padding: "8px 16px",
                         fontSize: "12px", color: "#60a5fa", fontWeight: "600"
-                    }}>🛒 3 items in cart</div>
+                    }}>🛒 {stats.totalOrders} total orders</div>
                 </div>
 
                 {/* Bento grid */}
@@ -122,7 +205,7 @@ export default function ConsumerDashboard() {
                             <div style={{
                                 fontSize: "10px", color: "#4ade80", fontWeight: "600",
                                 marginBottom: "6px", letterSpacing: "0.08em"
-                            }}>🥦 142 PRODUCTS AVAILABLE</div>
+                            }}>🥦 FRESH FROM TAMIL NADU FARMS</div>
                             <div style={{ fontSize: "22px", fontWeight: "800", color: "white", marginBottom: "6px" }}>
                                 Fresh Produce Shop
                             </div>
@@ -158,7 +241,7 @@ export default function ConsumerDashboard() {
                         </div>
                     </a>
 
-                    {/* Stats card */}
+                    {/* Stats card — real data */}
                     <div style={{
                         borderRadius: "20px",
                         background: "rgba(0,0,0,0.3)",
@@ -171,13 +254,15 @@ export default function ConsumerDashboard() {
                             This Month
                         </div>
                         <div>
-                            <div style={{ fontSize: "32px", fontWeight: "800", color: "#fbbf24" }}>₹1.8k</div>
+                            <div style={{ fontSize: "32px", fontWeight: "800", color: "#fbbf24" }}>
+                                {loading ? "..." : `₹${stats.totalSaved.toLocaleString()}`}
+                            </div>
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>Money Saved</div>
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                             {[
-                                { num: "24", label: "Orders" },
-                                { num: "18", label: "Farmers" },
+                                { num: loading ? "..." : stats.totalOrders.toString(), label: "Orders" },
+                                { num: loading ? "..." : stats.totalFarmers.toString(), label: "Farmers" },
                             ].map((s, i) => (
                                 <div key={i} style={{
                                     background: "rgba(255,255,255,0.05)",
@@ -211,7 +296,7 @@ export default function ConsumerDashboard() {
                         </div>
                     </a>
 
-                    {/* Orders card */}
+                    {/* Orders card — real data */}
                     <a href="/consumer/orders" style={{
                         textDecoration: "none", borderRadius: "20px",
                         background: "rgba(0,0,0,0.3)",
@@ -224,21 +309,30 @@ export default function ConsumerDashboard() {
                             📦 MY ORDERS
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                            {[
-                                { name: "Tomato · 5kg", status: "Delivered", color: "#4ade80" },
-                                { name: "Rice · 10kg", status: "On the way", color: "#fbbf24" },
-                                { name: "Spinach · 2kg", status: "Processing", color: "#60a5fa" },
-                            ].map((o, i) => (
-                                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>{o.name}</div>
-                                    <div style={{
-                                        fontSize: "10px", color: o.color,
-                                        background: `${o.color}18`,
-                                        padding: "2px 8px", borderRadius: "999px",
-                                        border: `1px solid ${o.color}30`
-                                    }}>{o.status}</div>
+                            {loading ? (
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Loading orders...</div>
+                            ) : orders.length === 0 ? (
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "center", padding: "10px 0" }}>
+                                    No orders yet.<br />
+                                    <span style={{ color: "#4ade80" }}>Start shopping! →</span>
                                 </div>
-                            ))}
+                            ) : orders.map((o: any, i: number) => {
+                                const status = (o.status || "processing").toLowerCase();
+                                const color = statusColor[status] || "#60a5fa";
+                                return (
+                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
+                                            {o.crop_name || o.product_name || "Order"} · {o.quantity || ""}
+                                        </div>
+                                        <div style={{
+                                            fontSize: "10px", color,
+                                            background: `${color}18`,
+                                            padding: "2px 8px", borderRadius: "999px",
+                                            border: `1px solid ${color}30`
+                                        }}>{o.status || "Processing"}</div>
+                                    </div>
+                                );
+                            })}
                         </div>
                         <div style={{ fontSize: "12px", color: "#a78bfa", fontWeight: "600" }}>View all orders →</div>
                     </a>

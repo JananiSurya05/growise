@@ -27,16 +27,23 @@ export default function ConsumerShop() {
     const [added, setAdded] = useState<any>(null);
     const [selected, setSelected] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
+    const [authUser, setAuthUser] = useState<any>(null);
 
     useEffect(() => {
-        loadProducts();
+        async function init() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = "/login"; return; }
+            setAuthUser(user);
+            loadProducts();
+        }
+        init();
     }, []);
 
     async function loadProducts() {
         setLoading(true);
         const { data } = await supabase
             .from("crops")
-            .select("*, users(name, location)")
+            .select("*")
             .eq("status", "Active") as { data: any[] };
 
         if (data) {
@@ -46,9 +53,9 @@ export default function ConsumerShop() {
                 price: c.price,
                 marketPrice: Math.round(c.price * 1.35),
                 quantity: c.quantity,
-                farmer: c.users?.name || "Local Farmer",
+                farmer: "Local Farmer",
                 farmer_id: c.farmer_id,
-                location: c.location,
+                location: c.location || "Tamil Nadu",
                 img: c.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
                 badge: c.badge || "🌿 Eco",
                 rating: 4.8,
@@ -61,22 +68,25 @@ export default function ConsumerShop() {
     }
 
     async function addToCart(product: Product) {
-        const userStr = localStorage.getItem("growise_user");
-        const user = userStr ? JSON.parse(userStr) : null;
+        if (!authUser) { window.location.href = "/login"; return; }
 
-        setCart([...cart, product.id]);
+        setCart(prev => [...prev, product.id]);
         setAdded(product.id);
         setTimeout(() => setAdded(null), 1500);
 
-        if (user) {
-            await supabase.from("orders").insert([{
-                consumer_id: user.id,
-                farmer_id: product.farmer_id,
-                crop_id: product.id,
-                quantity: 1,
-                total: product.price,
-                status: "Processing",
-            }] as any);
+        const { error } = await supabase.from("orders").insert([{
+            consumer_id: authUser.id,
+            farmer_id: product.farmer_id,
+            crop_id: product.id,
+            quantity: 1,
+            total: product.price,
+            amount_saved: product.marketPrice - product.price,
+            status: "Processing",
+        }] as any);
+
+        if (error) {
+            console.error("Order error:", error.message);
+            alert("Could not place order: " + error.message);
         }
     }
 
@@ -114,12 +124,12 @@ export default function ConsumerShop() {
                         </a>
                     ))}
                 </nav>
-                <a href="/login" style={{ textDecoration: "none" }}>
+                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
                         <span style={{ fontSize: "14px" }}>🚪</span>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
                     </div>
-                </a>
+                </div>
             </div>
 
             {/* Main */}
@@ -133,9 +143,11 @@ export default function ConsumerShop() {
                         </div>
                         <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white" }}>🥦 Fresh Produce Shop</h1>
                     </div>
-                    <div style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: "10px", padding: "8px 16px", fontSize: "13px", color: "#60a5fa", fontWeight: "600" }}>
-                        🛒 Cart ({cart.length})
-                    </div>
+                    <a href="/consumer/orders" style={{ textDecoration: "none" }}>
+                        <div style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: "10px", padding: "8px 16px", fontSize: "13px", color: "#60a5fa", fontWeight: "600", cursor: "pointer" }}>
+                            🛒 Cart ({cart.length}) → View Orders
+                        </div>
+                    </a>
                 </div>
 
                 {/* Banner */}
