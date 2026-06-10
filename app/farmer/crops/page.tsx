@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../lib/useAuth";
 
 type Crop = {
     id: any;
@@ -8,18 +9,16 @@ type Crop = {
     price: number;
     marketPrice: number;
     quantity: number;
-    sold: number;
     location: string;
     img: string;
     status: string;
-    orders: number;
     badge: string;
-    revenue: number;
     demand: string;
     season: string;
 };
 
 export default function MyCrops() {
+    const { user, loading: authLoading } = useAuth();
     const [crops, setCrops] = useState<Crop[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [name, setName] = useState("");
@@ -32,15 +31,11 @@ export default function MyCrops() {
     const fileRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        loadCrops();
-    }, []);
+        if (user) loadCrops();
+    }, [user]);
 
     async function loadCrops() {
         setLoadingCrops(true);
-        const userStr = localStorage.getItem("growise_user");
-        const user = userStr ? JSON.parse(userStr) : null;
-        if (!user) { setLoadingCrops(false); return; }
-
         const { data } = await supabase
             .from("crops")
             .select("*")
@@ -50,11 +45,13 @@ export default function MyCrops() {
             setCrops(data.map((c: any) => ({
                 id: c.id, name: c.name,
                 price: c.price, marketPrice: Math.round(c.price * 0.65),
-                quantity: c.quantity, sold: 0,
-                location: c.location, img: c.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
-                status: c.status || "Active", orders: 0,
-                badge: c.badge || "🆕 New", revenue: 0,
-                demand: c.demand || "Medium", season: c.season || "Year round"
+                quantity: c.quantity,
+                location: c.location,
+                img: c.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
+                status: c.status || "Active",
+                badge: c.badge || "🆕 New",
+                demand: c.demand || "Medium",
+                season: c.season || "Year round"
             })));
         }
         setLoadingCrops(false);
@@ -72,8 +69,6 @@ export default function MyCrops() {
         if (!name || !price || !quantity || !location) return;
         const p = parseFloat(price);
         const q = parseFloat(quantity);
-        const userStr = localStorage.getItem("growise_user");
-        const user = userStr ? JSON.parse(userStr) : null;
 
         const { data, error } = await supabase
             .from("crops")
@@ -82,7 +77,7 @@ export default function MyCrops() {
                 image_url: uploadedImg || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
                 badge: "🆕 New", demand: "Medium",
                 season: "Year round", status: "Active",
-                farmer_id: user?.id || null,
+                farmer_id: user.id,
             }] as any)
             .select()
             .single() as { data: any, error: any };
@@ -92,12 +87,13 @@ export default function MyCrops() {
         setCrops([...crops, {
             id: data.id, name: data.name,
             price: data.price, marketPrice: Math.round(data.price * 0.65),
-            quantity: data.quantity, sold: 0,
+            quantity: data.quantity,
             location: data.location,
             img: data.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
-            status: "Active", orders: 0,
-            badge: data.badge, revenue: 0,
-            demand: data.demand, season: data.season
+            status: "Active",
+            badge: data.badge,
+            demand: data.demand,
+            season: data.season
         }]);
 
         setName(""); setPrice(""); setQuantity(""); setLocation("");
@@ -110,8 +106,11 @@ export default function MyCrops() {
         if (selected?.id === id) setSelected(null);
     }
 
-    const totalRevenue = crops.reduce((a, c) => a + c.revenue, 0);
-    const totalOrders = crops.reduce((a, c) => a + c.orders, 0);
+    if (authLoading) return (
+        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
+        </div>
+    );
 
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
@@ -139,12 +138,12 @@ export default function MyCrops() {
                         </a>
                     ))}
                 </nav>
-                <a href="/login" style={{ textDecoration: "none" }}>
+                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
                         <span style={{ fontSize: "14px" }}>🚪</span>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
                     </div>
-                </a>
+                </div>
             </div>
 
             <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
@@ -161,7 +160,6 @@ export default function MyCrops() {
                     </button>
                 </div>
 
-                {/* Revenue banner */}
                 <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", marginBottom: "20px", height: "100px" }}>
                     <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1200&h=300&fit=crop" alt="revenue" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,77,78,0.97) 0%, rgba(0,0,0,0.5) 100%)" }} />
@@ -185,7 +183,6 @@ export default function MyCrops() {
                     </div>
                 </div>
 
-                {/* Add form */}
                 {showForm && (
                     <div style={{ background: "#012e2f", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "16px", padding: "20px", marginBottom: "20px" }}>
                         <div style={{ fontSize: "12px", fontWeight: "600", color: "#4ade80", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>🌱 New Crop Listing</div>
@@ -219,7 +216,7 @@ export default function MyCrops() {
                 )}
 
                 {loadingCrops ? (
-                    <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>Loading your crops from database...</div>
+                    <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>Loading your crops...</div>
                 ) : crops.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "48px", background: "#012e2f", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
                         <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌱</div>
@@ -237,9 +234,6 @@ export default function MyCrops() {
                                         <div style={{ position: "absolute", top: "8px", left: "8px" }}>
                                             <div style={{ background: "rgba(0,0,0,0.65)", borderRadius: "999px", padding: "2px 8px", fontSize: "9px", color: "#4ade80", fontWeight: "600" }}>{crop.badge}</div>
                                         </div>
-                                        <div style={{ position: "absolute", top: "8px", right: "8px" }}>
-                                            <div style={{ fontSize: "9px", fontWeight: "700", padding: "2px 7px", borderRadius: "999px", color: crop.demand === "Very High" ? "#4ade80" : crop.demand === "High" ? "#fbbf24" : "#60a5fa", background: crop.demand === "Very High" ? "rgba(74,222,128,0.15)" : crop.demand === "High" ? "rgba(251,191,36,0.15)" : "rgba(96,165,250,0.15)", border: `1px solid ${crop.demand === "Very High" ? "rgba(74,222,128,0.3)" : crop.demand === "High" ? "rgba(251,191,36,0.3)" : "rgba(96,165,250,0.3)"}` }}>{crop.demand}</div>
-                                        </div>
                                         <div style={{ position: "absolute", bottom: "6px", left: "10px" }}>
                                             <div style={{ fontSize: "13px", fontWeight: "700", color: "white" }}>{crop.name}</div>
                                         </div>
@@ -247,20 +241,11 @@ export default function MyCrops() {
                                     <div style={{ padding: "10px 12px" }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                                             <div style={{ fontSize: "16px", fontWeight: "800", color: "#4ade80" }}>₹{crop.price}/kg</div>
-                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>mkt: ₹{crop.marketPrice}</div>
-                                        </div>
-                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginBottom: "8px" }}>
-                                            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "6px", padding: "5px 8px" }}>
-                                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#60a5fa" }}>{crop.quantity}kg</div>
-                                                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)" }}>stock</div>
-                                            </div>
-                                            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "6px", padding: "5px 8px" }}>
-                                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#fbbf24" }}>📍 {crop.location}</div>
-                                                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)" }}>location</div>
-                                            </div>
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>📍 {crop.location}</div>
                                         </div>
                                         <div style={{ display: "flex", gap: "6px" }}>
-                                            <div style={{ flex: 1, textAlign: "center", padding: "5px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "6px", fontSize: "10px", color: "#4ade80", fontWeight: "600" }}>✅ Live</div>
+                                            <div style={{ flex: 1, textAlign: "center", padding: "5px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "6px", fontSize: "10px", color: "#4ade80", fontWeight: "600" }}>✅ {crop.status}</div>
+                                            <div style={{ padding: "5px 8px", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: "6px", fontSize: "10px", color: "#60a5fa" }}>{crop.quantity}kg</div>
                                             <button onClick={e => { e.stopPropagation(); deleteCrop(crop.id); }} style={{ padding: "5px 10px", background: "rgba(220,38,38,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", fontSize: "10px", color: "#f87171", cursor: "pointer", fontWeight: "600" }}>✕</button>
                                         </div>
                                     </div>
@@ -283,16 +268,15 @@ export default function MyCrops() {
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
                                         <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
                                             <div style={{ fontSize: "20px", fontWeight: "800", color: "#4ade80" }}>₹{selected.price}</div>
-                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>GroWise price</div>
+                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>Your price</div>
                                         </div>
                                         <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
                                             <div style={{ fontSize: "20px", fontWeight: "800", color: "#f87171" }}>₹{selected.marketPrice}</div>
-                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>Market rate</div>
+                                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>Middleman rate</div>
                                         </div>
                                     </div>
                                     <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: "10px", padding: "10px", textAlign: "center" }}>
-                                        <div style={{ fontSize: "16px", fontWeight: "800", color: "#fbbf24" }}>+₹{selected.price - selected.marketPrice}/kg extra</div>
-                                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{Math.round(((selected.price - selected.marketPrice) / selected.marketPrice) * 100)}% more than middleman</div>
+                                        <div style={{ fontSize: "16px", fontWeight: "800", color: "#fbbf24" }}>+₹{selected.price - selected.marketPrice}/kg extra income!</div>
                                     </div>
                                 </div>
                                 <div style={{ background: "#012e2f", border: "1px solid rgba(167,139,250,0.15)", borderRadius: "14px", padding: "14px" }}>
