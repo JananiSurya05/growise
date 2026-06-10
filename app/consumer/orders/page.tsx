@@ -8,6 +8,7 @@ export default function MyOrders() {
     const [orders, setOrders] = useState<any[]>([]);
     const [selected, setSelected] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
     useEffect(() => {
         loadOrders();
@@ -40,11 +41,11 @@ export default function MyOrders() {
     }
 
     async function deleteOrder(orderId: string) {
-        if (!confirm("Delete this order?")) return;
         await supabase.from("order_items").delete().eq("order_id", orderId);
         await supabase.from("orders").delete().eq("id", orderId);
         setOrders(prev => prev.filter(o => o.id !== orderId));
         if (selected?.id === orderId) setSelected(null);
+        setDeleteConfirm(null);
     }
 
     function getStatus(status: string) {
@@ -161,7 +162,7 @@ export default function MyOrders() {
                                         <div onClick={() => setSelected(order)} style={{ flex: 1, background: isSelected ? "rgba(96,165,250,0.05)" : "#012e2f", border: isSelected ? "2px solid rgba(96,165,250,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px 16px", cursor: "pointer", position: "relative" }}>
 
                                             {/* Delete button */}
-                                            <button onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }} style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", padding: "3px 10px", color: "#f87171", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}>✕ Delete</button>
+                                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(order.id); }} style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", padding: "3px 10px", color: "#f87171", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}>✕ Delete</button>
 
                                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", paddingRight: "70px" }}>
                                                 <div>
@@ -290,6 +291,25 @@ export default function MyOrders() {
                     </div>
                 )}
             </div>
+
+            {/* Custom Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: '#012e2f', border: '1px solid rgba(248,113,113,0.3)', borderRadius: '20px', padding: '28px', maxWidth: '360px', width: '90%', textAlign: 'center' }}>
+                        <div style={{ fontSize: '36px', marginBottom: '12px' }}>🗑️</div>
+                        <div style={{ fontSize: '18px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>Discard this order?</div>
+                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '24px' }}>This will permanently remove the order and all its items.</div>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '12px', color: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                                Keep Order
+                            </button>
+                            <button onClick={() => deleteOrder(deleteConfirm)} style={{ flex: 1, background: 'rgba(248,113,113,0.15)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: '12px', padding: '12px', color: '#f87171', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                                Discard ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
