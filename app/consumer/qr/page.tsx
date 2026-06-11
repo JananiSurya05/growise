@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../lib/useAuth";
 import { QRCodeSVG } from "qrcode.react";
 
 export default function QRPage() {
+    const { loading: authLoading } = useAuth();
     const [crops, setCrops] = useState<any[]>([]);
     const [selected, setSelected] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -37,6 +39,12 @@ export default function QRPage() {
         }
         return ["Vitamins", "Minerals", "Fiber"];
     }
+
+    if (authLoading) return (
+        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
+        </div>
+    );
 
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
@@ -136,7 +144,7 @@ export default function QRPage() {
                                                 <div style={{ fontSize: "16px", fontWeight: "700", color: "white" }}>{crop.name}</div>
                                                 <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 8px", borderRadius: "999px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)", color: "#60a5fa" }}>{crop.badge || "🌿 Eco"}</div>
                                             </div>
-                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>📍 {crop.location || "Tamil Nadu"}</div>
+                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>👨‍🌾 {crop.users?.name || "Local Farmer"} · 📍 {crop.location || "Tamil Nadu"}</div>
                                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>📦 {crop.quantity}kg available</div>
                                             <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
                                                 <div style={{ fontSize: "12px", fontWeight: "700", color: "#60a5fa" }}>₹{crop.price}/kg</div>
