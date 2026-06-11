@@ -24,3 +24,38 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* Mobile Responsive */
+@media (max-width: 768px) {
+
+  /* Hide sidebar on mobile */
+  div[style*="width: 200px"][style*="position: fixed"] {
+    display: none !important;
+  }
+
+  /* Remove sidebar margin on mobile */
+  div[style*="marginLeft: 200px"] {
+    margin-left: 0 !important;
+    padding: 16px !important;
+  }
+
+  /* Fix grid layouts for mobile */
+  div[style*="gridTemplateColumns: repeat(3"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  div[style*="gridTemplateColumns: repeat(4"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  div[style*="gridTemplateColumns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  div[style*="gridTemplateColumns: 1.2fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  div[style*="gridTemplateColumns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
