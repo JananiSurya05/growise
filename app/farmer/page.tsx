@@ -1,14 +1,45 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabase";
 
-export default function WeatherPage() {
+export default function FarmerDashboard() {
     const { user, loading: authLoading } = useAuth();
-    const [city, setCity] = useState("");
-    const [weather, setWeather] = useState<any>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [crops, setCrops] = useState<any[]>([]);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [stats, setStats] = useState({ totalCrops: 0, totalOrders: 0, totalRevenue: 0, totalKg: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) loadData();
+    }, [user]);
+
+    async function loadData() {
+        setLoading(true);
+
+        const [cropsRes, ordersRes] = await Promise.all([
+            supabase.from("crops").select("*").eq("farmer_id", user.id),
+            supabase.from("orders").select("*, order_items(*)").eq("farmer_id", user.id).order("created_at", { ascending: false }).limit(5),
+        ]);
+
+        const cropsData = (cropsRes.data || []) as any[];
+        const ordersData = (ordersRes.data || []) as any[];
+
+        setCrops(cropsData);
+        setOrders(ordersData);
+
+        const totalRevenue = ordersData.reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+        const totalKg = ordersData.reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
+
+        setStats({
+            totalCrops: cropsData.length,
+            totalOrders: ordersData.length,
+            totalRevenue,
+            totalKg,
+        });
+
+        setLoading(false);
+    }
 
     if (authLoading) return (
         <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -16,51 +47,7 @@ export default function WeatherPage() {
         </div>
     );
 
-    async function getWeather() {
-        if (!city.trim()) return;
-        setLoading(true);
-        setError("");
-        setWeather(null);
-        const res = await fetch(`/api/weather?city=${city}`);
-        const data = await res.json();
-        if (data.error) setError("City not found. Try again.");
-        else setWeather(data);
-        setLoading(false);
-    }
-
-    function getCropAlert(temp: number, desc: string) {
-        const d = desc.toLowerCase();
-        if (d.includes("rain") || d.includes("storm"))
-            return { alert: "⚠️ Rain expected — harvest crops early to avoid spoilage!", color: "#f87171", bg: "rgba(220,38,38,0.1)", border: "rgba(248,113,113,0.2)" };
-        if (temp > 38)
-            return { alert: "🔥 Extreme heat — water crops early morning and evening!", color: "#fbbf24", bg: "rgba(217,119,6,0.1)", border: "rgba(251,191,36,0.2)" };
-        if (temp < 15)
-            return { alert: "🥶 Cold warning — protect sensitive crops at night!", color: "#60a5fa", bg: "rgba(2,132,199,0.1)", border: "rgba(96,165,250,0.2)" };
-        return { alert: "✅ Good farming weather — ideal for field work today!", color: "#4ade80", bg: "rgba(22,163,74,0.1)", border: "rgba(74,222,128,0.2)" };
-    }
-
-    function getIcon(desc: string) {
-        const d = desc.toLowerCase();
-        if (d.includes("rain")) return "🌧️";
-        if (d.includes("storm")) return "⛈️";
-        if (d.includes("cloud")) return "☁️";
-        if (d.includes("clear")) return "☀️";
-        if (d.includes("mist") || d.includes("fog")) return "🌫️";
-        return "🌤️";
-    }
-
-    function getUVIndex(temp: number) {
-        if (temp > 35) return { value: "High", num: 8, color: "#f87171" };
-        if (temp > 28) return { value: "Moderate", num: 5, color: "#fbbf24" };
-        return { value: "Low", num: 2, color: "#4ade80" };
-    }
-
-    function getVisibility(desc: string) {
-        const d = desc.toLowerCase();
-        if (d.includes("fog") || d.includes("mist")) return "2 km";
-        if (d.includes("rain")) return "5 km";
-        return "10 km";
-    }
+    const firstName = user?.user_metadata?.full_name?.split(" ")[0] || "Farmer";
 
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
@@ -71,20 +58,30 @@ export default function WeatherPage() {
                     <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
                 </div>
                 <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
+
+                {/* Profile */}
+                <div style={{ marginBottom: "16px", paddingBottom: "14px", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 8px 14px" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "rgba(74,222,128,0.2)", border: "2px solid rgba(74,222,128,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", marginBottom: "6px" }}>
+                        {firstName[0]}
+                    </div>
+                    <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{firstName}</div>
+                    <div style={{ fontSize: "10px", color: "#4ade80" }}>● Online · Farmer</div>
+                </div>
+
                 <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
                     {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
+                        { icon: "⚡", label: "Dashboard", href: "/farmer", active: true },
                         { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
                         { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
                         { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather", active: true },
+                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
                         { icon: "💰", label: "Income", href: "/farmer/income" },
                         { icon: "📊", label: "Sales", href: "/farmer/sales" },
                     ].map((item, i) => (
                         <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(96,165,250,0.12)" : "transparent", border: item.active ? "1px solid rgba(96,165,250,0.22)" : "1px solid transparent" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(74,222,128,0.12)" : "transparent", border: item.active ? "1px solid rgba(74,222,128,0.22)" : "1px solid transparent" }}>
                                 <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
+                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
                             </div>
                         </a>
                     ))}
@@ -99,167 +96,154 @@ export default function WeatherPage() {
 
             {/* Main */}
             <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+
+                {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
-                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#60a5fa", boxShadow: "0 0 8px #60a5fa" }} />
-                            <span style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", letterSpacing: ".06em" }}>LIVE WEATHER STATION</span>
+                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
+                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", letterSpacing: ".06em" }}>FARMER DASHBOARD · LIVE DATA</span>
                         </div>
-                        <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-.5px" }}>Farm Weather Command</h1>
+                        <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white" }}>Welcome back, {firstName}! 👋</h1>
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginRight: "8px" }}>
-                            {["Chennai", "Madurai", "Coimbatore", "Trichy"].map(c => (
-                                <button key={c} onClick={() => setCity(c)} style={{ background: city === c ? "rgba(96,165,250,0.2)" : "rgba(255,255,255,0.05)", border: city === c ? "1px solid rgba(96,165,250,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: "999px", padding: "4px 12px", fontSize: "11px", color: city === c ? "#60a5fa" : "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Segoe UI', sans-serif" }}>{c}</button>
+                    <a href="/farmer/crops" style={{ textDecoration: "none" }}>
+                        <div style={{ background: "#4ade80", borderRadius: "10px", padding: "8px 18px", fontSize: "12px", color: "#0a0a0a", fontWeight: "700" }}>+ List New Crop</div>
+                    </a>
+                </div>
+
+                {/* KPI Stats */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "20px" }}>
+                    {[
+                        { label: "My Crops", value: loading ? "..." : stats.totalCrops, icon: "🌱", color: "#4ade80", href: "/farmer/crops" },
+                        { label: "Total Orders", value: loading ? "..." : stats.totalOrders, icon: "📦", color: "#60a5fa", href: "/farmer/sales" },
+                        { label: "Total Revenue", value: loading ? "..." : `₹${stats.totalRevenue}`, icon: "💰", color: "#fbbf24", href: "/farmer/sales" },
+                        { label: "Total Sold", value: loading ? "..." : `${stats.totalKg}kg`, icon: "⚖️", color: "#a78bfa", href: "/farmer/sales" },
+                    ].map((k, i) => (
+                        <a key={i} href={k.href} style={{ textDecoration: "none" }}>
+                            <div style={{ background: "rgba(0,0,0,0.25)", border: `1px solid ${k.color}22`, borderTop: `3px solid ${k.color}`, borderRadius: "12px", padding: "16px", backdropFilter: "blur(10px)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                                    <span style={{ fontSize: "20px" }}>{k.icon}</span>
+                                    <span style={{ fontSize: "9px", color: k.color, fontWeight: "600" }}>LIVE</span>
+                                </div>
+                                <div style={{ fontSize: "26px", fontWeight: "800", color: k.color, lineHeight: 1, marginBottom: "4px" }}>{k.value}</div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{k.label}</div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+
+                {/* Banner */}
+                <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", marginBottom: "20px", height: "100px" }}>
+                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&h=300&fit=crop" alt="farm" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,77,78,0.97) 0%, rgba(0,0,0,0.5) 100%)" }} />
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px" }}>
+                        <div>
+                            <div style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", marginBottom: "4px" }}>GROWISE FARMER NETWORK</div>
+                            <div style={{ fontSize: "18px", fontWeight: "800", color: "white" }}>Sell directly. Earn more. No middlemen.</div>
+                        </div>
+                        <div style={{ display: "flex", gap: "28px" }}>
+                            {[
+                                { label: "Platform Fee", value: "₹0", color: "#4ade80" },
+                                { label: "Direct to Consumer", value: "100%", color: "#60a5fa" },
+                                { label: "Middleman Cut", value: "₹0", color: "#fbbf24" },
+                            ].map((s, i) => (
+                                <div key={i} style={{ textAlign: "center" }}>
+                                    <div style={{ fontSize: "18px", fontWeight: "700", color: s.color }}>{s.value}</div>
+                                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
+                                </div>
                             ))}
                         </div>
-                        <input value={city} onChange={e => setCity(e.target.value)} onKeyDown={e => e.key === "Enter" && getWeather()} placeholder="Enter city..." style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "9px 14px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif", width: "160px" }} />
-                        <button onClick={getWeather} style={{ background: "#4ade80", color: "#0a0a0a", border: "none", borderRadius: "10px", padding: "9px 18px", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}>{loading ? "..." : "Search"}</button>
                     </div>
                 </div>
 
-                {error && <div style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "12px", padding: "14px 18px", color: "#f87171", fontSize: "13px", marginBottom: "16px" }}>{error}</div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "20px" }}>
 
-                {!weather && !error && (
-                    <div>
-                        <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", height: "160px", marginBottom: "20px" }}>
-                            <img src="https://images.unsplash.com/photo-1504608524841-42584120d693?w=1400&h=400&fit=crop" alt="sky" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,77,78,0.95) 0%, rgba(0,0,0,0.4) 100%)" }} />
-                            <div style={{ position: "absolute", inset: 0, padding: "24px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <div>
-                                    <div style={{ fontSize: "13px", color: "#60a5fa", fontWeight: "600", marginBottom: "6px" }}>KHARIF SEASON 2026 · TAMIL NADU</div>
-                                    <div style={{ fontSize: "22px", fontWeight: "800", color: "white", marginBottom: "4px" }}>Southwest Monsoon Active</div>
-                                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>Enter your city above to get live weather data</div>
-                                </div>
-                                <div style={{ display: "flex", gap: "28px" }}>
-                                    {[{ label: "Avg Temp", value: "32°C" }, { label: "Humidity", value: "78%" }, { label: "Rainfall", value: "High" }, { label: "Season", value: "Kharif" }].map((s, i) => (
-                                        <div key={i} style={{ textAlign: "center" }}>
-                                            <div style={{ fontSize: "20px", fontWeight: "700", color: "#60a5fa" }}>{s.value}</div>
-                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                    {/* My Crops */}
+                    <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "18px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                            <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "600", textTransform: "uppercase", letterSpacing: ".06em" }}>🌱 My Active Crops</div>
+                            <a href="/farmer/crops" style={{ fontSize: "11px", color: "#60a5fa", textDecoration: "none" }}>View all →</a>
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px", marginBottom: "16px" }}>
-                            {[{ month: "May–Jun", crop: "Rice, Groundnut", status: "Sowing", color: "#4ade80" }, { month: "Jul–Aug", crop: "Maize, Sorghum", status: "Growing", color: "#60a5fa" }, { month: "Sep–Oct", crop: "Tomato, Onion", status: "Harvest", color: "#fbbf24" }].map((c, i) => (
-                                <div key={i} style={{ background: "#012e2f", border: `1px solid ${c.color}22`, borderTop: `3px solid ${c.color}`, borderRadius: "14px", padding: "16px" }}>
-                                    <div style={{ fontSize: "11px", color: c.color, fontWeight: "600", marginBottom: "6px", textTransform: "uppercase", letterSpacing: ".05em" }}>{c.status}</div>
-                                    <div style={{ fontSize: "14px", fontWeight: "700", color: "white", marginBottom: "4px" }}>{c.month}</div>
-                                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)" }}>{c.crop}</div>
+                        {loading ? (
+                            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>Loading...</div>
+                        ) : crops.length === 0 ? (
+                            <div style={{ textAlign: "center", padding: "24px" }}>
+                                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🌱</div>
+                                <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>No crops listed yet</div>
+                                <a href="/farmer/crops" style={{ textDecoration: "none" }}>
+                                    <div style={{ background: "#4ade80", borderRadius: "10px", padding: "8px 16px", fontSize: "12px", color: "#0a0a0a", fontWeight: "700", display: "inline-block" }}>+ Add First Crop</div>
+                                </a>
+                            </div>
+                        ) : (
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
+                                {crops.slice(0, 4).map((crop, i) => (
+                                    <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", overflow: "hidden" }}>
+                                        <img src={crop.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=200&fit=crop"} alt={crop.name} style={{ width: "100%", height: "70px", objectFit: "cover" }} />
+                                        <div style={{ padding: "8px 10px" }}>
+                                            <div style={{ fontSize: "12px", fontWeight: "700", color: "white", marginBottom: "3px" }}>{crop.name}</div>
+                                            <div style={{ fontSize: "11px", color: "#4ade80" }}>₹{crop.price}/kg · {crop.quantity}kg</div>
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>📍 {crop.location}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right column */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+
+                        {/* Recent Orders */}
+                        <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "18px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                                <div style={{ fontSize: "12px", color: "#60a5fa", fontWeight: "600", textTransform: "uppercase", letterSpacing: ".06em" }}>📦 Recent Orders</div>
+                                <a href="/farmer/sales" style={{ fontSize: "11px", color: "#60a5fa", textDecoration: "none" }}>View all →</a>
+                            </div>
+                            {loading ? (
+                                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>Loading...</div>
+                            ) : orders.length === 0 ? (
+                                <div style={{ textAlign: "center", padding: "16px", color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>
+                                    No orders yet. List your crops to start selling!
                                 </div>
+                            ) : orders.map((order, i) => {
+                                const itemNames = order.order_items?.map((it: any) => it.crop_name).join(", ") || "Order";
+                                const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+                                const statusColor = order.status === "Delivered" ? "#4ade80" : order.status === "On the way" ? "#fbbf24" : "#60a5fa";
+                                return (
+                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < orders.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                                        <div>
+                                            <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{itemNames}</div>
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>{date} · {order.quantity}kg</div>
+                                        </div>
+                                        <div style={{ textAlign: "right" }}>
+                                            <div style={{ fontSize: "13px", fontWeight: "700", color: "#4ade80" }}>₹{order.total}</div>
+                                            <div style={{ fontSize: "9px", color: statusColor }}>{order.status}</div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Quick Links */}
+                        <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "18px" }}>
+                            <div style={{ fontSize: "12px", color: "#a78bfa", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>⚡ Quick Actions</div>
+                            {[
+                                { label: "Check Weather", href: "/farmer/weather", icon: "🌤️", color: "#60a5fa" },
+                                { label: "AI Crop Advisor", href: "/farmer/advisor", icon: "🤖", color: "#4ade80" },
+                                { label: "Disease Scanner", href: "/farmer/disease", icon: "📸", color: "#f87171" },
+                                { label: "Income Calculator", href: "/farmer/income", icon: "💰", color: "#fbbf24" },
+                            ].map((link, i) => (
+                                <a key={i} href={link.href} style={{ textDecoration: "none" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px", borderRadius: "8px", marginBottom: "4px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                        <span style={{ fontSize: "16px" }}>{link.icon}</span>
+                                        <span style={{ fontSize: "12px", color: link.color, fontWeight: "600" }}>{link.label}</span>
+                                        <span style={{ marginLeft: "auto", fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>→</span>
+                                    </div>
+                                </a>
                             ))}
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-                            <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px" }}>
-                                <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "600", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>🌾 Crop Weather Guide</div>
-                                {[{ crop: "Rice", temp: "22–32°C", rain: "High", icon: "🌾" }, { crop: "Tomato", temp: "20–28°C", rain: "Medium", icon: "🍅" }, { crop: "Chilli", temp: "25–30°C", rain: "Low", icon: "🌶️" }, { crop: "Groundnut", temp: "25–35°C", rain: "Medium", icon: "🥜" }].map((c, i) => (
-                                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", paddingBottom: "10px", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                                        <span style={{ fontSize: "18px" }}>{c.icon}</span>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{c.crop}</div>
-                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>Ideal: {c.temp}</div>
-                                        </div>
-                                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textAlign: "right" }}>Rain: {c.rain}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px" }}>
-                                <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: "600", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>⚠️ Weather Alerts This Week</div>
-                                {[{ type: "Heavy Rain", district: "Coimbatore", severity: "High", color: "#f87171", icon: "🌧️" }, { type: "Heat Wave", district: "Madurai", severity: "Medium", color: "#fbbf24", icon: "🔥" }, { type: "Strong Winds", district: "Chennai", severity: "Low", color: "#60a5fa", icon: "💨" }, { type: "Clear Skies", district: "Trichy", severity: "Good", color: "#4ade80", icon: "☀️" }].map((a, i) => (
-                                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", paddingBottom: "10px", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                                        <span style={{ fontSize: "18px" }}>{a.icon}</span>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{a.type}</div>
-                                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{a.district}</div>
-                                        </div>
-                                        <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 8px", borderRadius: "999px", color: a.color, background: `${a.color}15`, border: `1px solid ${a.color}30` }}>{a.severity}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
-                )}
-
-                {weather && (() => {
-                    const temp = Math.round(weather.main.temp - 273.15);
-                    const feels = Math.round(weather.main.feels_like - 273.15);
-                    const tempMin = Math.round(weather.main.temp_min - 273.15);
-                    const tempMax = Math.round(weather.main.temp_max - 273.15);
-                    const desc = weather.weather[0].description;
-                    const humidity = weather.main.humidity;
-                    const wind = weather.wind.speed;
-                    const pressure = weather.main.pressure;
-                    const visibility = getVisibility(desc);
-                    const cropAlert = getCropAlert(temp, desc);
-                    const uv = getUVIndex(temp);
-                    const clouds = weather.clouds?.all || 0;
-                    return (
-                        <div>
-                            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", marginBottom: "16px" }}>
-                                <img src="https://images.unsplash.com/photo-1504608524841-42584120d693?w=1400&h=300&fit=crop" alt="sky" style={{ width: "100%", height: "160px", objectFit: "cover", display: "block" }} />
-                                <div style={{ position: "absolute", inset: 0, background: "rgba(1,46,47,0.85)" }} />
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px" }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-                                        <div style={{ fontSize: "64px" }}>{getIcon(desc)}</div>
-                                        <div>
-                                            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", marginBottom: "4px" }}>📍 {weather.name}, India</div>
-                                            <div style={{ fontSize: "52px", fontWeight: "800", color: "white", lineHeight: 1, marginBottom: "4px" }}>{temp}°C</div>
-                                            <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", textTransform: "capitalize" }}>{desc}</div>
-                                        </div>
-                                    </div>
-                                    <div style={{ display: "flex", gap: "28px" }}>
-                                        {[{ label: "Feels Like", value: `${feels}°C` }, { label: "Min / Max", value: `${tempMin}° / ${tempMax}°` }, { label: "Humidity", value: `${humidity}%` }, { label: "Wind", value: `${wind} m/s` }].map((s, i) => (
-                                            <div key={i} style={{ textAlign: "center" }}>
-                                                <div style={{ fontSize: "18px", fontWeight: "700", color: "white" }}>{s.value}</div>
-                                                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{ background: cropAlert.bg, border: `1px solid ${cropAlert.border}`, borderRadius: "14px", padding: "14px 20px", marginBottom: "16px" }}>
-                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>🌾 Crop Advisory</div>
-                                <div style={{ fontSize: "15px", fontWeight: "600", color: cropAlert.color }}>{cropAlert.alert}</div>
-                            </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
-                                {[{ label: "Pressure", value: `${pressure} hPa`, icon: "🌡️", color: "#a78bfa" }, { label: "Visibility", value: visibility, icon: "👁️", color: "#60a5fa" }, { label: "Cloud Cover", value: `${clouds}%`, icon: "☁️", color: "#94a3b8" }, { label: "UV Index", value: `${uv.num} · ${uv.value}`, icon: "☀️", color: uv.color }].map((s, i) => (
-                                    <div key={i} style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
-                                        <div style={{ fontSize: "24px", marginBottom: "8px" }}>{s.icon}</div>
-                                        <div style={{ fontSize: "16px", fontWeight: "700", color: s.color, marginBottom: "3px" }}>{s.value}</div>
-                                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{s.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "18px" }}>
-                                    <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "600", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>✅ Good to grow now</div>
-                                    {[{ crop: "Rice", reason: `${temp}°C is ideal`, icon: "🌾" }, { crop: "Groundnut", reason: "Good humidity levels", icon: "🥜" }, { crop: "Maize", reason: "Wind helps pollination", icon: "🌽" }].map((c, i) => (
-                                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                                            <span style={{ fontSize: "18px" }}>{c.icon}</span>
-                                            <div>
-                                                <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{c.crop}</div>
-                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{c.reason}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div style={{ background: "#012e2f", border: "1px solid rgba(248,113,113,0.15)", borderRadius: "16px", padding: "18px" }}>
-                                    <div style={{ fontSize: "12px", color: "#f87171", fontWeight: "600", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>⚠️ Be careful today</div>
-                                    {[{ action: "Check soil moisture", reason: `${humidity}% humidity — monitor carefully`, icon: "💧" }, { action: "Inspect for pests", reason: "Warm weather increases risk", icon: "🐛" }, { action: "Avoid spraying", reason: wind > 5 ? "Wind too strong" : "Check wind before spraying", icon: "💨" }].map((a, i) => (
-                                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                                            <span style={{ fontSize: "18px" }}>{a.icon}</span>
-                                            <div>
-                                                <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{a.action}</div>
-                                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{a.reason}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })()}
+                </div>
             </div>
         </main>
     );
