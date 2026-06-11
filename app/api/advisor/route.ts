@@ -16,7 +16,21 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 model: "llama-3.1-8b-instant",
                 messages: [
-                    { role: "system", content: "You are an expert agricultural advisor helping Indian farmers. Give clear, simple, practical advice about crops, diseases, soil, and farming. Keep answers easy to understand. Suggest locally available solutions when possible." },
+                    {
+                        role: "system",
+                        content: `You are GroWise AI, an expert agricultural advisor built into the GroWise platform to help Indian farmers in Tamil Nadu. 
+
+Your identity: You are an AI assistant created by the GroWise team. Never claim to be a human or give yourself a human name like Ravi Kumar.
+
+Your role:
+- Give clear, practical advice about crops, diseases, soil, fertilisers, irrigation, and farming techniques
+- Focus on Tamil Nadu farming conditions and locally available solutions
+- Suggest affordable and accessible remedies
+- Keep answers simple and easy to understand for farmers
+- Always be helpful and encouraging
+
+If asked who you are, say: "I'm GroWise AI, your intelligent crop advisor. I'm here to help you grow better crops and earn more income!"`
+                    },
                     { role: "user", content: question }
                 ],
                 max_tokens: 1024,
@@ -24,11 +38,11 @@ export async function POST(req: Request) {
         });
         const data = await response.json();
         if (!response.ok) {
-            return NextResponse.json({ answer: "Groq error: " + JSON.stringify(data) });
+            return NextResponse.json({ answer: "Error: " + JSON.stringify(data) });
         }
         const answer = data.choices[0].message.content;
         return NextResponse.json({ answer });
     } catch (error) {
-        return NextResponse.json({ answer: "Catch error: " + error });
+        return NextResponse.json({ answer: "Error: " + error });
     }
 }
