@@ -12,15 +12,34 @@ export async function POST(req: Request) {
                 "Authorization": `Bearer ${key}`,
             },
             body: JSON.stringify({
-                model: "llama-3.1-8b-instant",
+                model: "meta-llama/llama-4-scout-17b-16e-instruct",
                 messages: [
                     {
-                        role: "system",
-                        content: "You are an expert plant pathologist helping Indian farmers. When given a description of a plant problem, identify the most likely disease or issue and provide: 1) Disease name 2) Cause 3) Symptoms to look for 4) Treatment using locally available products 5) Prevention tips. Keep it practical and simple."
-                    },
-                    {
                         role: "user",
-                        content: `A farmer has uploaded a photo of their plant that appears to have some disease or problem. Based on common plant diseases in Tamil Nadu, India, please provide a detailed diagnosis and treatment plan. Assume the photo shows visible symptoms like discoloration, spots, wilting, or pest damage. Give a realistic and helpful response as if you can see the plant.`
+                        content: [
+                            {
+                                type: "image_url",
+                                image_url: { url: image }
+                            },
+                            {
+                                type: "text",
+                                text: `You are an expert plant pathologist helping Indian farmers in Tamil Nadu.
+
+First, check if this image shows a plant or crop. 
+
+If it is NOT a plant (e.g. a person, animal, object, building, etc.), respond with exactly:
+"❌ This doesn't appear to be a plant photo. Please upload a clear photo of your crop or plant leaves showing the problem."
+
+If it IS a plant, analyze it and provide:
+1. 🌿 Plant identified
+2. 🦠 Disease/Issue detected
+3. 📋 Cause
+4. 💊 Treatment (using locally available products in India)
+5. 🛡️ Prevention tips
+
+Keep the response practical and helpful for Indian farmers.`
+                            }
+                        ]
                     }
                 ],
                 max_tokens: 1024,
@@ -30,7 +49,7 @@ export async function POST(req: Request) {
         const data = await response.json();
 
         if (!response.ok) {
-            return NextResponse.json({ result: "Error: " + JSON.stringify(data) });
+            return NextResponse.json({ result: "Error analyzing image. Please try again." });
         }
 
         const result = data.choices[0].message.content;
