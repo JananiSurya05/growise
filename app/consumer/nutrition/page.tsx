@@ -1,7 +1,8 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState } from "react";
 import { useAuth } from "../../lib/useAuth";
-import { supabase } from "../../lib/supabase";
+import ConsumerLayout from "../../components/ConsumerLayout";
 
 const seasonal = [
     { name: "Tomato", season: "Year round", calories: 18, protein: "0.9g", vitamin: "Vitamin C, K", benefits: "Boosts immunity, good for heart", img: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop", score: 92 },
@@ -24,45 +25,10 @@ export default function NutritionGuide() {
     const [selectedDiet, setSelectedDiet] = useState<typeof diets[0] | null>(null);
     const [selectedCrop, setSelectedCrop] = useState<typeof seasonal[0] | null>(null);
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Consumer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/consumer" },
-                        { icon: "🥦", label: "Shop", href: "/consumer/shop" },
-                        { icon: "📱", label: "Scan QR", href: "/consumer/qr" },
-                        { icon: "🥗", label: "Nutrition", href: "/consumer/nutrition", active: true },
-                        { icon: "📦", label: "My Orders", href: "/consumer/orders" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(96,165,250,0.12)" : "transparent", border: item.active ? "1px solid rgba(96,165,250,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <ConsumerLayout activeHref="/consumer/nutrition">
                 <div style={{ marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
                         <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
@@ -94,7 +60,7 @@ export default function NutritionGuide() {
                     <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🎯 Your Diet Goal</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
                         {diets.map((diet, i) => (
-                            <div key={i} onClick={() => setSelectedDiet(selectedDiet?.name === diet.name ? null : diet)} style={{ background: selectedDiet?.name === diet.name ? "rgba(74,222,128,0.1)" : "#012e2f", border: selectedDiet?.name === diet.name ? "2px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "16px", cursor: "pointer", textAlign: "center" }}>
+                            <button type="button" key={i} onClick={() => setSelectedDiet(selectedDiet?.name === diet.name ? null : diet)} style={{ background: selectedDiet?.name === diet.name ? "rgba(74,222,128,0.1)" : "#012e2f", border: selectedDiet?.name === diet.name ? "2px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "16px", cursor: "pointer", textAlign: "center", font: "inherit", width: "100%" }}>
                                 <div style={{ fontSize: "28px", marginBottom: "8px" }}>{diet.icon}</div>
                                 <div style={{ fontSize: "13px", fontWeight: "700", color: "white", marginBottom: "6px" }}>{diet.name}</div>
                                 <div style={{ display: "flex", gap: "4px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -102,7 +68,7 @@ export default function NutritionGuide() {
                                         <div key={j} style={{ fontSize: "9px", padding: "2px 6px", borderRadius: "999px", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.2)", color: "#4ade80" }}>{c}</div>
                                     ))}
                                 </div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                     {selectedDiet && (
@@ -118,7 +84,7 @@ export default function NutritionGuide() {
                         <div style={{ fontSize: "12px", color: "#60a5fa", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🌾 Seasonal Crop Nutrition</div>
                         <div style={{ display: "grid", gridTemplateColumns: selectedCrop ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: "12px" }}>
                             {seasonal.map((crop, i) => (
-                                <div key={i} onClick={() => setSelectedCrop(selectedCrop?.name === crop.name ? null : crop)} style={{ background: selectedCrop?.name === crop.name ? "rgba(96,165,250,0.06)" : "#012e2f", border: selectedCrop?.name === crop.name ? "2px solid rgba(96,165,250,0.3)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer" }}>
+                                <button type="button" key={i} onClick={() => setSelectedCrop(selectedCrop?.name === crop.name ? null : crop)} style={{ background: selectedCrop?.name === crop.name ? "rgba(96,165,250,0.06)" : "#012e2f", border: selectedCrop?.name === crop.name ? "2px solid rgba(96,165,250,0.3)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer", padding: 0, font: "inherit", textAlign: "left", width: "100%", display: "block" }}>
                                     <div style={{ position: "relative", height: "100px" }}>
                                         <img src={crop.img} alt={crop.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(1,46,47,0.9) 0%, transparent 55%)" }} />
@@ -143,7 +109,7 @@ export default function NutritionGuide() {
                                         </div>
                                         <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", lineHeight: "1.4" }}>{crop.benefits}</div>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -179,7 +145,6 @@ export default function NutritionGuide() {
                         </div>
                     )}
                 </div>
-            </div>
-        </main>
+        </ConsumerLayout>
     );
 }

@@ -1,15 +1,36 @@
 "use client";
-import { useState, useEffect } from "react";
+import AppLoadingState from "../components/ui/AppLoadingState";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/useAuth";
+import { useGovernmentOrderStream } from "../lib/useRealtime";
+import { useToast } from "../lib/useToast";
+import GovernmentSidebar from "../components/GovernmentSidebar";
+import AppEmptyState from "../components/ui/AppEmptyState";
+
+type ActivityEntry = { status: string; total: number; date: string };
+type CropStat = { location: string; count: number };
+type AnomalyResult = { order_id: string; is_anomaly: boolean; anomaly_score: number; risk_level: string; alert_reasons: string[] };
+type AnomalyScan = { total_orders: number; anomalies_detected: number; anomaly_rate: number; results: AnomalyResult[] };
+
+type LiveOrderEntry = { id: string; total: number; status: string; timestamp: string };
+type EcosystemCrop = { crop: string; currentPrice: number; predictedPrice: number | null; priceChange: number | null; diseaseRisk: { disease: string; severity: string; probability: number } | null; ecosystemRiskScore: number; riskLevel: string; recommendation: string };
+type EcosystemData = { location: string; season: string; crops: EcosystemCrop[]; overallEcosystemRisk: number; generatedAt: string };
 
 export default function GovernmentDashboard() {
     const { loading: authLoading } = useAuth();
+    const { toast } = useToast();
     const [time, setTime] = useState("");
     const [stats, setStats] = useState({ farmers: 0, crops: 0, orders: 0, consumers: 0, totalRevenue: 0, totalSaved: 0 });
-    const [recentActivity, setRecentActivity] = useState<any[]>([]);
-    const [cropStats, setCropStats] = useState<any[]>([]);
+    const [recentActivity, setRecentActivity] = useState<ActivityEntry[]>([]);
+    const [cropStats, setCropStats] = useState<CropStat[]>([]);
     const [loading, setLoading] = useState(true);
+    const [anomalyScan, setAnomalyScan] = useState<AnomalyScan | null>(null);
+    const [anomalyLoading, setAnomalyLoading] = useState(false);
+    const [liveOrders, setLiveOrders] = useState<LiveOrderEntry[]>([]);
+    const [liveOrderCount, setLiveOrderCount] = useState(0);
+    const [ecosystemData, setEcosystemData] = useState<EcosystemData | null>(null);
+    const [ecosystemLoading, setEcosystemLoading] = useState(false);
 
     useEffect(() => {
         const update = () => {
@@ -21,9 +42,40 @@ export default function GovernmentDashboard() {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        loadData();
-    }, []);
+    async function runAnomalyScan(ordersData: { total: number; amount_saved: number; status: string; created_at: string }[]) {
+        setAnomalyLoading(true);
+        try {
+            const orders = ordersData.map((o, i) => ({
+                order_id: `order_${i}`,
+                price_per_kg: Math.round(o.total / 25),
+                quantity_kg: 25,
+                total: o.total,
+                amount_saved: o.amount_saved,
+            }));
+            const res = await fetch("/api/ml/anomaly-detection", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orders }),
+            });
+            if (res.ok) setAnomalyScan(await res.json());
+        } catch {
+            // ML service not running
+        }
+        setAnomalyLoading(false);
+    }
+
+    async function loadEcosystem(crops: { name: string; price: number; quantity: number }[], location: string) {
+        setEcosystemLoading(true);
+        try {
+            const res = await fetch("/api/market-intelligence", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ location, crops }),
+            });
+            if (res.ok) setEcosystemData(await res.json());
+        } catch { /* ML/weather not available */ }
+        setEcosystemLoading(false);
+    }
 
     async function loadData() {
         setLoading(true);
@@ -35,11 +87,13 @@ export default function GovernmentDashboard() {
             supabase.from("users").select("id", { count: "exact" }).eq("role", "consumer"),
         ]);
 
-        const ordersData = (ordersRes.data || []) as any[];
-        const cropsData = (cropsRes.data || []) as any[];
+        type OrderRow = { total: number; amount_saved: number; status: string; created_at: string };
+        type CropRow = { name: string; price: number; quantity: number; location: string; status: string };
+        const ordersData = (ordersRes.data || []) as OrderRow[];
+        const cropsData = (cropsRes.data || []) as CropRow[];
 
-        const totalRevenue = ordersData.reduce((sum: number, o: any) => sum + (o.total || 0), 0);
-        const totalSaved = ordersData.reduce((sum: number, o: any) => sum + (o.amount_saved || 0), 0);
+        const totalRevenue = ordersData.reduce((sum, o) => sum + (o.total || 0), 0);
+        const totalSaved = ordersData.reduce((sum, o) => sum + (o.amount_saved || 0), 0);
 
         setStats({
             farmers: farmersRes.count || 0,
@@ -51,7 +105,7 @@ export default function GovernmentDashboard() {
         });
 
         // Recent activity (no private data)
-        setRecentActivity(ordersData.slice(0, 8).map((o: any) => ({
+        setRecentActivity(ordersData.slice(0, 8).map((o) => ({
             status: o.status,
             total: o.total,
             date: new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
@@ -59,19 +113,51 @@ export default function GovernmentDashboard() {
 
         // Crop stats by location
         const locationMap: Record<string, number> = {};
-        cropsData.forEach((c: any) => {
+        cropsData.forEach((c) => {
             if (c.location) locationMap[c.location] = (locationMap[c.location] || 0) + 1;
         });
         setCropStats(Object.entries(locationMap).map(([loc, count]) => ({ location: loc, count })).sort((a, b) => b.count - a.count));
 
         setLoading(false);
+
+        // Run anomaly scan on recent orders
+        runAnomalyScan(ordersData.slice(0, 50));
+
+        // Load ecosystem intelligence (top 5 crops by volume)
+        const topCrops = cropsData
+            .filter(c => c.status === "Active")
+            .slice(0, 5)
+            .map(c => ({ name: c.name, price: c.price, quantity: c.quantity }));
+        if (topCrops.length > 0) loadEcosystem(topCrops, "Chennai");
     }
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, []);
+
+    // Live order stream via Supabase Realtime
+    const handleLiveOrder = useCallback((order: Record<string, unknown>) => {
+        const total = order.total as number ?? 0;
+        const entry: LiveOrderEntry = {
+            id: order.id as string ?? `live-${Date.now()}`,
+            total,
+            status: order.status as string ?? "Processing",
+            timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+        };
+        setLiveOrders(prev => [entry, ...prev.slice(0, 9)]);
+        setLiveOrderCount(n => n + 1);
+        setStats(prev => ({ ...prev, orders: prev.orders + 1, totalRevenue: prev.totalRevenue + total }));
+        // Quick anomaly check on live order
+        const pricePerKg = total / 25;
+        if (pricePerKg > 500 || total > 50000) {
+            toast({ type: "warning", title: "Anomaly Alert", message: `Suspicious order — ₹${total} (₹${Math.round(pricePerKg)}/kg). Review required.`, duration: 10000 });
+        }
+    }, [toast]);
+
+    useGovernmentOrderStream(handleLiveOrder, !authLoading);
+
+    if (authLoading) return <AppLoadingState />;
 
     const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
@@ -84,30 +170,7 @@ export default function GovernmentDashboard() {
     return (
         <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
 
-            {/* Sidebar */}
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.3)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.25)", padding: "0 8px", marginBottom: "20px" }}>ADMIN PORTAL</div>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 10px", borderRadius: "8px", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.2)", marginBottom: "2px" }}>
-                    <span style={{ fontSize: "14px" }}>⚡</span>
-                    <span style={{ fontSize: "12px", color: "#a78bfa", fontWeight: "600" }}>Dashboard</span>
-                </div>
-                <div style={{ marginTop: "auto" }}>
-                    <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "2px" }}>Admin Portal</div>
-                        <div style={{ fontSize: "12px", color: "white", fontWeight: "600" }}>GroWise Analytics</div>
-                    </div>
-                    <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 10px", borderRadius: "8px" }}>
-                            <span>🚪</span>
-                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <GovernmentSidebar activeHref="/government" />
 
             {/* Main */}
             <div style={{ marginLeft: "200px", flex: 1, padding: "20px 24px" }}>
@@ -147,6 +210,134 @@ export default function GovernmentDashboard() {
                         </div>
                     ))}
                 </div>
+
+                {/* Live Order Stream */}
+                {liveOrders.length > 0 && (
+                    <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(74,222,128,0.15)", borderRadius: "16px", padding: "14px 18px", marginBottom: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                            <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80", animation: "pulse 1.5s infinite" }} />
+                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "700", letterSpacing: ".06em" }}>LIVE ORDER STREAM</span>
+                            <span style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)", borderRadius: "10px", padding: "1px 8px", fontSize: "9px", color: "#4ade80", fontWeight: "700" }}>{liveOrderCount} since login</span>
+                            <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
+                        </div>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                            {liveOrders.map((o, i) => (
+                                <div key={o.id} style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", borderRadius: "8px", padding: "6px 10px", opacity: Math.max(0.4, 1 - i * 0.08) }}>
+                                    <div style={{ fontSize: "11px", fontWeight: "700", color: "#4ade80" }}>₹{o.total}</div>
+                                    <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>{o.timestamp}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ML Anomaly Detection Panel */}
+                {(anomalyScan || anomalyLoading) && (
+                    <div style={{ background: "rgba(0,0,0,0.3)", border: `1px solid ${anomalyScan && anomalyScan.anomalies_detected > 0 ? "rgba(248,113,113,0.3)" : "rgba(74,222,128,0.15)"}`, borderRadius: "16px", padding: "18px", marginBottom: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <span style={{ fontSize: "18px" }}>🛡️</span>
+                                <div>
+                                    <div style={{ fontSize: "12px", color: "#f87171", fontWeight: "700", textTransform: "uppercase", letterSpacing: ".06em" }}>AI Anomaly Detection Engine</div>
+                                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>Isolation Forest + Z-Score • Real-time fraud & market manipulation detection</div>
+                                </div>
+                            </div>
+                            <div style={{ background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: "6px", padding: "3px 10px", fontSize: "9px", color: "#f87171", fontWeight: "700" }}>ML MODEL ACTIVE</div>
+                        </div>
+                        {anomalyLoading ? (
+                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Scanning transactions with Isolation Forest...</div>
+                        ) : anomalyScan && (
+                            <div>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "12px" }}>
+                                    {[
+                                        { label: "Orders Scanned", value: anomalyScan.total_orders, color: "#60a5fa" },
+                                        { label: "Anomalies Found", value: anomalyScan.anomalies_detected, color: anomalyScan.anomalies_detected > 0 ? "#f87171" : "#4ade80" },
+                                        { label: "Anomaly Rate", value: `${(anomalyScan.anomaly_rate * 100).toFixed(1)}%`, color: anomalyScan.anomaly_rate > 0.1 ? "#f87171" : "#fbbf24" },
+                                    ].map((s, i) => (
+                                        <div key={i} style={{ background: "rgba(255,255,255,0.03)", borderRadius: "8px", padding: "10px 14px", textAlign: "center" }}>
+                                            <div style={{ fontSize: "20px", fontWeight: "800", color: s.color }}>{s.value}</div>
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {anomalyScan.results.filter(r => r.is_anomaly).slice(0, 3).map((r, i) => (
+                                    <div key={i} style={{ background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.15)", borderRadius: "8px", padding: "10px 14px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "12px" }}>
+                                        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: r.risk_level === "HIGH" ? "#f87171" : "#fbbf24", flexShrink: 0 }} />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: "11px", fontWeight: "600", color: "white" }}>{r.order_id} — Risk: <span style={{ color: r.risk_level === "HIGH" ? "#f87171" : "#fbbf24" }}>{r.risk_level}</span></div>
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)" }}>{r.alert_reasons.join(" • ")}</div>
+                                        </div>
+                                        <div style={{ fontSize: "11px", fontWeight: "700", color: "#f87171" }}>Score: {(r.anomaly_score * 100).toFixed(0)}</div>
+                                    </div>
+                                ))}
+                                {anomalyScan.anomalies_detected === 0 && (
+                                    <div style={{ fontSize: "12px", color: "#4ade80", textAlign: "center", padding: "8px" }}>No anomalies detected. Market activity appears normal.</div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Ecosystem Intelligence Panel */}
+                {(ecosystemData || ecosystemLoading) && (
+                    <div style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: "16px", padding: "18px", marginBottom: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <span style={{ fontSize: "18px" }}>🌐</span>
+                                <div>
+                                    <div style={{ fontSize: "12px", color: "#60a5fa", fontWeight: "700", textTransform: "uppercase", letterSpacing: ".06em" }}>Ecosystem Intelligence</div>
+                                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>
+                                        {ecosystemData ? `${ecosystemData.location} · ${ecosystemData.season} season · Weather × ML × Disease risk` : "Loading cross-module analysis..."}
+                                    </div>
+                                </div>
+                            </div>
+                            {ecosystemData && (
+                                <div style={{ background: ecosystemData.overallEcosystemRisk > 0.6 ? "rgba(248,113,113,0.1)" : "rgba(96,165,250,0.1)", border: `1px solid ${ecosystemData.overallEcosystemRisk > 0.6 ? "rgba(248,113,113,0.3)" : "rgba(96,165,250,0.3)"}`, borderRadius: "8px", padding: "4px 12px", textAlign: "center" }}>
+                                    <div style={{ fontSize: "14px", fontWeight: "800", color: ecosystemData.overallEcosystemRisk > 0.6 ? "#f87171" : ecosystemData.overallEcosystemRisk > 0.35 ? "#fbbf24" : "#4ade80" }}>
+                                        {(ecosystemData.overallEcosystemRisk * 100).toFixed(0)}%
+                                    </div>
+                                    <div style={{ fontSize: "8px", color: "rgba(255,255,255,0.4)" }}>ECOSYSTEM RISK</div>
+                                </div>
+                            )}
+                        </div>
+                        {ecosystemLoading ? (
+                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Correlating weather, ML prices, and disease risk across all crops...</div>
+                        ) : ecosystemData && (
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "10px" }}>
+                                {ecosystemData.crops.map((c, i) => (
+                                    <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${c.riskLevel === "HIGH" ? "rgba(248,113,113,0.2)" : c.riskLevel === "MEDIUM" ? "rgba(251,191,36,0.2)" : "rgba(74,222,128,0.15)"}`, borderLeft: `3px solid ${c.riskLevel === "HIGH" ? "#f87171" : c.riskLevel === "MEDIUM" ? "#fbbf24" : "#4ade80"}`, borderRadius: "10px", padding: "12px" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                                            <div style={{ fontSize: "12px", fontWeight: "700", color: "white" }}>{c.crop}</div>
+                                            <div style={{ fontSize: "9px", fontWeight: "700", color: c.riskLevel === "HIGH" ? "#f87171" : c.riskLevel === "MEDIUM" ? "#fbbf24" : "#4ade80", background: c.riskLevel === "HIGH" ? "rgba(248,113,113,0.12)" : c.riskLevel === "MEDIUM" ? "rgba(251,191,36,0.12)" : "rgba(74,222,128,0.12)", padding: "1px 6px", borderRadius: "4px" }}>
+                                                {c.riskLevel}
+                                            </div>
+                                        </div>
+                                        <div style={{ display: "flex", gap: "12px", marginBottom: "6px" }}>
+                                            <div>
+                                                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.35)" }}>Current</div>
+                                                <div style={{ fontSize: "12px", fontWeight: "700", color: "white" }}>₹{c.currentPrice}</div>
+                                            </div>
+                                            {c.predictedPrice && (
+                                                <div>
+                                                    <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.35)" }}>ML Forecast</div>
+                                                    <div style={{ fontSize: "12px", fontWeight: "700", color: c.priceChange !== null && c.priceChange > 0 ? "#4ade80" : "#f87171" }}>
+                                                        ₹{c.predictedPrice.toFixed(1)} {c.priceChange !== null ? `(${c.priceChange > 0 ? "+" : ""}${c.priceChange}%)` : ""}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {c.diseaseRisk && (
+                                            <div style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.15)", borderRadius: "5px", padding: "4px 8px", marginBottom: "6px", fontSize: "9px", color: "#f87171" }}>
+                                                ⚠️ {c.diseaseRisk.disease} · {(c.diseaseRisk.probability * 100).toFixed(0)}% risk
+                                            </div>
+                                        )}
+                                        <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4 }}>{c.recommendation}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Main grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "16px", marginBottom: "16px" }}>
@@ -188,9 +379,9 @@ export default function GovernmentDashboard() {
                     <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "18px" }}>
                         <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "600", marginBottom: "16px", textTransform: "uppercase", letterSpacing: ".06em" }}>📍 Crops by Location</div>
                         {loading ? (
-                            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>Loading...</div>
+                            <AppLoadingState fullScreen={false} />
                         ) : cropStats.length === 0 ? (
-                            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>No crops listed yet</div>
+                            <AppEmptyState icon="🌱" title="No crops listed yet" />
                         ) : cropStats.map((loc, i) => (
                             <div key={i} style={{ marginBottom: "12px" }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>

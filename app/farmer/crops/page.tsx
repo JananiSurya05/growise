@@ -1,10 +1,27 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
+import FarmerLayout from "../../components/FarmerLayout";
+import AppEmptyState from "../../components/ui/AppEmptyState";
+import AppInput from "../../components/ui/AppInput";
+
+type DbCrop = {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    location: string;
+    image_url: string | null;
+    status: string | null;
+    badge: string | null;
+    demand: string | null;
+    season: string | null;
+};
 
 type Crop = {
-    id: any;
+    id: string;
     name: string;
     price: number;
     marketPrice: number;
@@ -30,32 +47,34 @@ export default function MyCrops() {
     const [loadingCrops, setLoadingCrops] = useState(true);
     const fileRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (user) loadCrops();
-    }, [user]);
-
     async function loadCrops() {
+        if (!user) return;
         setLoadingCrops(true);
         const { data } = await supabase
             .from("crops")
-            .select("*")
-            .eq("farmer_id", user.id) as { data: any[] };
+            .select("id, name, price, quantity, location, image_url, status, badge, demand, season")
+            .eq("farmer_id", user.id) as { data: DbCrop[] | null };
 
         if (data && data.length > 0) {
-            setCrops(data.map((c: any) => ({
+            setCrops(data.map((c) => ({
                 id: c.id, name: c.name,
                 price: c.price, marketPrice: Math.round(c.price * 0.65),
                 quantity: c.quantity,
                 location: c.location,
-                img: c.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
-                status: c.status || "Active",
-                badge: c.badge || "🆕 New",
-                demand: c.demand || "Medium",
-                season: c.season || "Year round"
+                img: c.image_url ?? "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
+                status: c.status ?? "Active",
+                badge: c.badge ?? "🆕 New",
+                demand: c.demand ?? "Medium",
+                season: c.season ?? "Year round"
             })));
         }
         setLoadingCrops(false);
     }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (user) loadCrops();
+    }, [user]);
 
     function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -66,87 +85,56 @@ export default function MyCrops() {
     }
 
     async function addCrop() {
-        if (!name || !price || !quantity || !location) return;
+        if (!user || !name || !price || !quantity || !location) return;
         const p = parseFloat(price);
         const q = parseFloat(quantity);
+        if (!p || p <= 0 || p > 100000) { alert("Price must be between ₹1 and ₹1,00,000."); return; }
+        if (!q || q <= 0 || q > 100000) { alert("Quantity must be between 1 and 1,00,000 kg."); return; }
 
-        const { data, error } = await supabase
+        const insertResult = await supabase
             .from("crops")
             .insert([{
                 name, price: p, quantity: q, location,
-                image_url: uploadedImg || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
+                image_url: uploadedImg ?? "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
                 badge: "🆕 New", demand: "Medium",
                 season: "Year round", status: "Active",
                 farmer_id: user.id,
-            }] as any)
-            .select()
-            .single() as { data: any, error: any };
+            }] as never[])
+            .select("id, name, price, quantity, location, image_url, status, badge, demand, season")
+            .single();
 
-        if (error) { alert("Error: " + error.message); return; }
+        const error = insertResult.error;
+        const data = insertResult.data as DbCrop | null;
+
+        if (error || !data) { alert("Error: " + (error?.message ?? "Insert failed")); return; }
 
         setCrops([...crops, {
             id: data.id, name: data.name,
             price: data.price, marketPrice: Math.round(data.price * 0.65),
             quantity: data.quantity,
             location: data.location,
-            img: data.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
-            status: "Active",
-            badge: data.badge,
-            demand: data.demand,
-            season: data.season
+            img: data.image_url ?? "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
+            status: data.status ?? "Active",
+            badge: data.badge ?? "🆕 New",
+            demand: data.demand ?? "Medium",
+            season: data.season ?? "Year round"
         }]);
 
         setName(""); setPrice(""); setQuantity(""); setLocation("");
         setUploadedImg(null); setShowForm(false);
     }
 
-    async function deleteCrop(id: any) {
-        await supabase.from("crops").delete().eq("id", id);
+    async function deleteCrop(id: string) {
+        if (!user) return;
+        await supabase.from("crops").delete().eq("id", id).eq("farmer_id", user.id);
         setCrops(crops.filter(c => c.id !== id));
         if (selected?.id === id) setSelected(null);
     }
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops", active: true },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(74,222,128,0.12)" : "transparent", border: item.active ? "1px solid rgba(74,222,128,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <FarmerLayout activeHref="/farmer/crops" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
@@ -193,18 +181,15 @@ export default function MyCrops() {
                                 { label: "Price/kg (₹)", value: price, set: setPrice, placeholder: "e.g. 25" },
                                 { label: "Quantity (kg)", value: quantity, set: setQuantity, placeholder: "e.g. 100" },
                             ].map((f, i) => (
-                                <div key={i}>
-                                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "6px", display: "block" }}>{f.label}</label>
-                                    <input value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif" }} />
-                                </div>
+                                <AppInput key={i} label={f.label} value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder} />
                             ))}
                         </div>
                         <div style={{ marginBottom: "14px" }}>
                             <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "8px", display: "block" }}>Crop Photo</label>
                             <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                                <div onClick={() => fileRef.current?.click()} style={{ width: "100px", height: "80px", background: uploadedImg ? "transparent" : "rgba(255,255,255,0.04)", border: uploadedImg ? "none" : "2px dashed rgba(74,222,128,0.25)", borderRadius: "10px", overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <button type="button" onClick={() => fileRef.current?.click()} aria-label="Upload crop photo" style={{ width: "100px", height: "80px", background: uploadedImg ? "transparent" : "rgba(255,255,255,0.04)", border: uploadedImg ? "none" : "2px dashed rgba(74,222,128,0.25)", borderRadius: "10px", overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, padding: 0, font: "inherit" }}>
                                     {uploadedImg ? <img src={uploadedImg} alt="crop" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ textAlign: "center" }}><div style={{ fontSize: "22px" }}>📸</div><div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>Upload</div></div>}
-                                </div>
+                                </button>
                                 <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
                                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: "1.6" }}>Upload a clear photo of your crop.<br />Good photos get <span style={{ color: "#4ade80", fontWeight: "600" }}>3x more orders!</span></div>
                             </div>
@@ -216,18 +201,16 @@ export default function MyCrops() {
                 )}
 
                 {loadingCrops ? (
-                    <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>Loading your crops...</div>
+                    <AppLoadingState fullScreen={false} label="Loading your crops..." />
                 ) : crops.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "48px", background: "#012e2f", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
-                        <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌱</div>
-                        <div style={{ fontSize: "16px", fontWeight: "600", color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>No crops listed yet</div>
-                        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>Click "+ List New Crop" to add your first crop!</div>
+                    <div style={{ background: "#012e2f", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <AppEmptyState icon="🌱" title="No crops listed yet" description='Click "+ List New Crop" to add your first crop!' />
                     </div>
                 ) : (
                     <div style={{ display: "grid", gridTemplateColumns: selected ? "1.3fr 0.7fr" : "1fr", gap: "20px" }}>
                         <div style={{ display: "grid", gridTemplateColumns: selected ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: "12px", alignContent: "start" }}>
                             {crops.map((crop) => (
-                                <div key={crop.id} onClick={() => setSelected(selected?.id === crop.id ? null : crop)} style={{ background: selected?.id === crop.id ? "rgba(74,222,128,0.06)" : "#012e2f", border: selected?.id === crop.id ? "2px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer" }}>
+                                <div key={crop.id} role="button" tabIndex={0} aria-label={`View details for ${crop.name}`} onClick={() => setSelected(selected?.id === crop.id ? null : crop)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(selected?.id === crop.id ? null : crop); } }} style={{ background: selected?.id === crop.id ? "rgba(74,222,128,0.06)" : "#012e2f", border: selected?.id === crop.id ? "2px solid rgba(74,222,128,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer" }}>
                                     <div style={{ position: "relative", height: "110px" }}>
                                         <img src={crop.img} alt={crop.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(1,46,47,0.85) 0%, transparent 55%)" }} />
@@ -246,7 +229,7 @@ export default function MyCrops() {
                                         <div style={{ display: "flex", gap: "6px" }}>
                                             <div style={{ flex: 1, textAlign: "center", padding: "5px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "6px", fontSize: "10px", color: "#4ade80", fontWeight: "600" }}>✅ {crop.status}</div>
                                             <div style={{ padding: "5px 8px", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: "6px", fontSize: "10px", color: "#60a5fa" }}>{crop.quantity}kg</div>
-                                            <button onClick={e => { e.stopPropagation(); deleteCrop(crop.id); }} style={{ padding: "5px 10px", background: "rgba(220,38,38,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", fontSize: "10px", color: "#f87171", cursor: "pointer", fontWeight: "600" }}>✕</button>
+                                            <button type="button" onClick={e => { e.stopPropagation(); deleteCrop(crop.id); }} aria-label={`Delete ${crop.name}`} style={{ padding: "5px 10px", background: "rgba(220,38,38,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", fontSize: "10px", color: "#f87171", cursor: "pointer", fontWeight: "600" }}>✕</button>
                                         </div>
                                     </div>
                                 </div>
@@ -297,7 +280,6 @@ export default function MyCrops() {
                         )}
                     </div>
                 )}
-            </div>
-        </main>
+        </FarmerLayout>
     );
 }

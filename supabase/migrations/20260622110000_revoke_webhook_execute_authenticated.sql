@@ -1,0 +1,53 @@
+-- GroWise - tighten apply_razorpay_webhook grants to anon-only
+--
+-- FOUND BY: scripts/validate-db.mjs (webhook-function check), run live
+-- against the project after 20260622090000_razorpay_webhook_security_definer.sql
+-- was applied. information_schema.routine_privileges showed EXECUTE granted
+-- to anon, authenticated, postgres, AND service_role on
+-- public.apply_razorpay_webhook(text, text) - not anon-only as that
+-- migration's comments stated.
+--
+-- ROOT CAUSE: that migration's `REVOKE ALL ... FROM PUBLIC` only revokes the
+-- PUBLIC pseudo-role grant. Supabase projects have a default privilege rule
+-- (ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO
+-- anon, authenticated, service_role) that fires automatically on every
+-- CREATE FUNCTION in the public schema - a grant made directly to a named
+-- role that REVOKE ALL FROM PUBLIC does not undo. The subsequent
+-- `GRANT EXECUTE ... TO anon` was additive, not a replacement, so the
+-- pre-existing authenticated/service_role grants from that default rule
+-- survived untouched.
+--
+-- IS THIS EXPLOITABLE? No new exposure - apply_razorpay_webhook's safety
+-- comes from the HMAC signature check inside the function rejecting any
+-- forged call, not from restricting which role can call it (see that
+-- migration's header comment for why). An authenticated consumer calling it
+-- can't do anything an anonymous caller couldn't already do. This migration
+-- is a least-privilege cleanup to match the documented intent, not a fix for
+-- a live vulnerability.
+--
+-- service_role and postgres are left untouched: postgres is the function
+-- owner (implicit, not a real grant to revoke) and service_role is
+-- Supabase's RLS-bypass role - both having EXECUTE is expected and outside
+-- this migration's scope.
+--
+-- NOT APPLIED - review and apply manually.
+
+REVOKE EXECUTE ON FUNCTION public.apply_razorpay_webhook(text, text) FROM authenticated;
+
+-- --- ROLLBACK ---
+-- GRANT EXECUTE ON FUNCTION public.apply_razorpay_webhook(text, text) TO authenticated;
+
+-- --- VALIDATION ---
+-- 1. Confirm authenticated no longer has EXECUTE (expect 3 rows: anon,
+--    postgres, service_role - NOT authenticated):
+--      SELECT grantee, privilege_type FROM information_schema.routine_privileges
+--      WHERE routine_name = 'apply_razorpay_webhook'
+--      ORDER BY grantee;
+--
+-- 2. Or simply re-run the validation script:
+--      npm run validate-db webhook-function
+--    Expect PASS, with no "EXECUTE also granted to authenticated" failure.
+--
+-- 3. Confirm anon is unaffected (the webhook route must still work):
+--      SELECT public.apply_razorpay_webhook('{"event":"payment.captured"}', 'not-a-real-signature');
+--      -- expect 'config_missing' or 'invalid_signature', not a permission error

@@ -1,10 +1,12 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState } from "react";
 import { useAuth } from "../../lib/useAuth";
-import { supabase } from "../../lib/supabase";
+import FarmerLayout from "../../components/FarmerLayout";
+import AppInput from "../../components/ui/AppInput";
 
 export default function IncomeCalculator() {
-    const { loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [crop, setCrop] = useState("");
     const [quantity, setQuantity] = useState("");
     const [price, setPrice] = useState("");
@@ -19,11 +21,7 @@ export default function IncomeCalculator() {
         { crop: "Potato", price: 18, img: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=60&h=60&fit=crop" },
     ];
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     function calculate() {
         const qty = parseFloat(quantity);
@@ -37,40 +35,7 @@ export default function IncomeCalculator() {
     }
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income", active: true },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(251,191,36,0.12)" : "transparent", border: item.active ? "1px solid rgba(251,191,36,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <FarmerLayout activeHref="/farmer/income" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"}>
                 <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", marginBottom: "24px", height: "130px" }}>
                     <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1200&h=300&fit=crop" alt="money" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(1,77,78,0.97) 0%, rgba(0,0,0,0.5) 100%)" }} />
@@ -108,10 +73,7 @@ export default function IncomeCalculator() {
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>Enter your details</div>
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 {[{ label: "Crop Name", value: crop, set: setCrop, placeholder: "e.g. Tomato" }, { label: "Quantity (kg)", value: quantity, set: setQuantity, placeholder: "e.g. 100", type: "number" }, { label: "Your Price per kg (₹)", value: price, set: setPrice, placeholder: "e.g. 25", type: "number" }].map((f, i) => (
-                                    <div key={i}>
-                                        <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "6px", display: "block" }}>{f.label}</label>
-                                        <input value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder} type={f.type || "text"} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "11px 14px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif" }} />
-                                    </div>
+                                    <AppInput key={i} label={f.label} value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder} type={f.type || "text"} />
                                 ))}
                                 <button onClick={calculate} style={{ background: "linear-gradient(135deg, #d97706, #fbbf24)", border: "none", borderRadius: "12px", padding: "13px", fontSize: "14px", fontWeight: "700", color: "#0a0a0a", cursor: "pointer" }}>
                                     Calculate My Income →
@@ -160,7 +122,7 @@ export default function IncomeCalculator() {
                                 <div style={{ background: "linear-gradient(135deg, rgba(217,119,6,0.2), rgba(180,83,9,0.15))", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "16px", padding: "20px", textAlign: "center" }}>
                                     <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: "600", marginBottom: "8px" }}>💰 Extra money in your pocket</div>
                                     <div style={{ fontSize: "48px", fontWeight: "800", color: "#fbbf24", marginBottom: "4px" }}>₹{result.saved.toLocaleString()}</div>
-                                    <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>That's {result.percent}% more income for {quantity}kg of {crop}</div>
+                                    <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>That&apos;s {result.percent}% more income for {quantity}kg of {crop}</div>
                                 </div>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
                                     {[{ label: "Monthly (x4 sells)", value: `₹${(result.saved * 4).toLocaleString()}`, color: "#4ade80" }, { label: "Yearly savings", value: `₹${(result.saved * 48).toLocaleString()}`, color: "#fbbf24" }, { label: "5 year savings", value: `₹${(result.saved * 240).toLocaleString()}`, color: "#a78bfa" }].map((s, i) => (
@@ -177,7 +139,6 @@ export default function IncomeCalculator() {
                         )}
                     </div>
                 </div>
-            </div>
-        </main>
+        </FarmerLayout>
     );
 }

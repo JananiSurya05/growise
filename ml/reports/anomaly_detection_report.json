@@ -1,0 +1,26 @@
+{
+  "phase": "ML-6",
+  "task": "Anomaly Detection",
+  "models": {
+    "Z-Score": {
+      "precision": 0.4762,
+      "recall": 0.5333,
+      "f1": 0.5031
+    },
+    "IsolationForest": {
+      "precision": 0.3125,
+      "recall": 0.4333,
+      "f1": 0.3631
+    },
+    "Autoencoder": "Autoencoder"
+  },
+  "total_transactions": 3000,
+  "anomalies_detected": 150,
+  "contamination_rate": 0.05,
+  "features": [
+    "price_per_kg",
+    "quantity_kg",
+    "total",
+    "amount_saved"
+  ]
+}

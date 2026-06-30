@@ -1,6 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
+import { registerNativeAuthListener } from "../lib/capacitor-auth";
 
 const quotes = [
     "\"The farmer is the only man in our economy who buys everything at retail, sells everything at wholesale.\" — John F. Kennedy",
@@ -12,6 +17,7 @@ const quotes = [
 const LOGO_TEXT = "GroWise";
 
 export default function Login() {
+    const router = useRouter();
     const [quoteIndex, setQuoteIndex] = useState(0);
     const [fade, setFade] = useState(true);
     const [loading, setLoading] = useState<string | null>(null);
@@ -20,6 +26,16 @@ export default function Login() {
     const [typedText, setTypedText] = useState("");
     const [typewriterDone, setTypewriterDone] = useState(false);
     const [cardsVisible, setCardsVisible] = useState(false);
+
+    // Register the native deep-link handler once on mount (no-op on web)
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+        const cleanup = registerNativeAuthListener(
+            (role) => router.replace(`/${role}`),
+            (msg) => { alert("Sign-in failed: " + msg); setLoading(null); }
+        );
+        return cleanup;
+    }, []);
 
     // Typewriter effect
     useEffect(() => {
@@ -52,19 +68,41 @@ export default function Login() {
         if (!selectedRole) return;
         setLoading(selectedRole);
 
-        // Save role in cookie before redirect
-        document.cookie = `growise_pending_role=${selectedRole}; path=/`;
+        if (Capacitor.isNativePlatform()) {
+            // Native Android: redirect to the app's deep link scheme so Android
+            // intercepts the callback and the appUrlOpen listener handles it.
+            // Role is passed in the URL because server cookies are not available
+            // in the Chrome Custom Tabs → WebView handoff.
+            const redirectTo = `growise://auth/callback?role=${selectedRole}`;
 
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        });
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: { redirectTo, skipBrowserRedirect: true },
+            });
 
-        if (error) {
-            alert("Google sign-in failed: " + error.message);
-            setLoading(null);
+            if (error || !data.url) {
+                alert("Google sign-in failed: " + (error?.message ?? "No URL returned"));
+                setLoading(null);
+                return;
+            }
+
+            // Opens in Chrome Custom Tabs — avoids Google's WebView OAuth block.
+            // The appUrlOpen listener (registered above) handles the callback.
+            await Browser.open({ url: data.url });
+        } else {
+            // Web: use cookie-based role tracking and server-side /auth/callback
+            document.cookie = `growise_pending_role=${selectedRole}; path=/; SameSite=Lax`;
+            const redirectTo = `${window.location.origin}/auth/callback`;
+
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: { redirectTo },
+            });
+
+            if (error) {
+                alert("Google sign-in failed: " + error.message);
+                setLoading(null);
+            }
         }
     }
 
@@ -131,14 +169,33 @@ export default function Login() {
           opacity: 0.6;
           cursor: not-allowed;
         }
+        .role-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+        }
+        @media (max-width: 767px) {
+          .role-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+        .login-main {
+          padding: 32px 40px;
+        }
+        @media (max-width: 767px) {
+          .login-main {
+            padding: 24px 16px;
+          }
+        }
       `}</style>
 
-            <main style={{
+            <main className="login-main" style={{
                 minHeight: "100vh", background: "#014D4E",
                 fontFamily: "'Segoe UI', sans-serif",
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "space-between",
-                padding: "32px 40px", position: "relative", overflow: "hidden",
+                position: "relative", overflow: "hidden",
             }}>
 
                 {/* Grid background */}
@@ -147,7 +204,7 @@ export default function Login() {
 
                 {/* Logo */}
                 <div style={{ position: "relative", zIndex: 2, textAlign: "center", width: "100%" }}>
-                    <a href="/" style={{ textDecoration: "none" }}>
+                    <Link href="/" style={{ textDecoration: "none" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "6px" }}>
                             <span style={{ fontSize: "28px" }}>🌿</span>
                             <span style={{ fontSize: "44px", fontWeight: "800", letterSpacing: "-2px", lineHeight: 1, color: "white" }}>
@@ -163,33 +220,37 @@ export default function Login() {
                                 Sow Smart. Grow Wise.
                             </div>
                         )}
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Cards or Google Sign-in */}
                 <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "960px" }}>
 
                     {!showRoleSelect ? (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+                        <div className="role-cards-grid">
                             {[
                                 { role: "farmer", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=300&fit=crop", label: "Farmer", desc: "List crops, get AI advice, sell directly to consumers.", color: "#4ade80", border: "rgba(74,222,128,0.3)", bg: "rgba(22,163,74,0.06)", badge: "🌾 FOR FARMERS" },
                                 { role: "consumer", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&h=300&fit=crop", label: "Consumer", desc: "Shop fresh produce, scan QR and track your orders.", color: "#60a5fa", border: "rgba(96,165,250,0.3)", bg: "rgba(2,132,199,0.06)", badge: "🛒 FOR CONSUMERS" },
-                                { role: "government", img: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=600&h=300&fit=crop", label: "Admin Portal", desc: "Monitor analytics, sustainability and farmer welfare.", color: "#a78bfa", border: "rgba(167,139,250,0.3)", bg: "rgba(124,58,237,0.06)", badge: "🏛️ ADMIN PORTAL" },
                             ].map((item, i) => (
-                                <div
+                                <button
                                     key={i}
+                                    type="button"
                                     className="role-card"
                                     onClick={() => pickRole(item.role)}
+                                    aria-label={`Continue as ${item.label}`}
                                     style={{
+                                        display: "block",
+                                        textAlign: "left",
+                                        background: "none",
+                                        font: "inherit",
+                                        width: "100%",
                                         border: `1px solid ${item.border}`,
                                         opacity: cardsVisible ? 1 : 0,
-                                        animation: cardsVisible ? `dropDown 0.6s ease forwards` : "none",
-                                        animationDelay: `${i * 0.15}s`,
-                                        animationFillMode: "both",
+                                        animation: cardsVisible ? `dropDown 0.6s ease ${i * 0.15}s both` : "none",
                                     }}
                                 >
                                     <div style={{ position: "relative", height: "180px" }}>
-                                        <img src={item.img} alt={item.role} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                        <img src={item.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)" }} />
                                         <div style={{ position: "absolute", bottom: "12px", left: "16px", fontSize: "11px", fontWeight: "600", color: item.color, background: "rgba(0,0,0,0.4)", padding: "3px 10px", borderRadius: "999px", border: `1px solid ${item.border}` }}>
                                             {item.badge}
@@ -202,7 +263,7 @@ export default function Login() {
                                             Enter as {item.label} →
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     ) : (
@@ -239,7 +300,7 @@ export default function Login() {
                                 </button>
 
                                 <div style={{ marginTop: "16px", fontSize: "11px", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
-                                    By continuing, you agree to GroWise's terms of service
+                                    By continuing, you agree to GroWise&apos;s terms of service
                                 </div>
                             </div>
                         </div>

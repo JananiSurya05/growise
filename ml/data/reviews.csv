@@ -1,0 +1,1001 @@
+review_id,farmer_id,crop,text,rating,sentiment
+review_00000,farmer_0041,Tomato,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00001,farmer_0022,Groundnut,Not satisfied. Price changed after ordering.,2,negative
+review_00002,farmer_0049,Potato,Good value for money. Will definitely reorder.,4,positive
+review_00003,farmer_0034,Tomato,Very fresh and organic. Highly recommended.,5,positive
+review_00004,farmer_0010,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00005,farmer_0047,Coconut,Quantity was less than ordered. Disappointed. Recommended!,2,negative
+review_00006,farmer_0029,Potato,Decent quality. Will order again if price drops. Not ordering again.,3,neutral
+review_00007,farmer_0023,Groundnut,Not satisfied. Price changed after ordering. Will buy again.,2,negative
+review_00008,farmer_0015,Sugarcane,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00009,farmer_0002,Lady Finger,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00010,farmer_0039,Brinjal,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00011,farmer_0039,Carrot,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00012,farmer_0024,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00013,farmer_0039,Lady Finger,Not satisfied. Price changed after ordering. Not ordering again.,2,negative
+review_00014,farmer_0006,Banana,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00015,farmer_0037,Tomato,Very fresh and organic. Highly recommended.,5,positive
+review_00016,farmer_0033,Sugarcane,Very fresh and organic. Highly recommended.,5,positive
+review_00017,farmer_0005,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00018,farmer_0032,Cauliflower,Decent quality. Will order again if price drops.,3,neutral
+review_00019,farmer_0023,Groundnut,"Good produce, slightly overpriced but worth it. Not ordering again.",4,positive
+review_00020,farmer_0039,Cotton,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00021,farmer_0014,Banana,Delivery was late but produce quality was good.,3,neutral
+review_00022,farmer_0006,Lady Finger,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00023,farmer_0042,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00024,farmer_0010,Tomato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00025,farmer_0034,Cabbage,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00026,farmer_0049,Cotton,Delivery was late but produce quality was good.,3,neutral
+review_00027,farmer_0046,Brinjal,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00028,farmer_0002,Coconut,Quantity was less than ordered. Disappointed.,2,negative
+review_00029,farmer_0045,Lady Finger,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00030,farmer_0027,Onion,Quantity was less than ordered. Disappointed. Will buy again.,2,negative
+review_00031,farmer_0044,Potato,Delivery was late but produce quality was good. Price was fair.,3,neutral
+review_00032,farmer_0010,Banana,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00033,farmer_0019,Chilli,Not satisfied. Price changed after ordering. Not ordering again.,2,negative
+review_00034,farmer_0022,Banana,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00035,farmer_0033,Sugarcane,Amazing farmer! Always delivers premium quality.,5,positive
+review_00036,farmer_0038,Cauliflower,Fresh and clean vegetables. Packaging was great. Delivery took too long.,4,positive
+review_00037,farmer_0037,Cabbage,Decent quality. Will order again if price drops.,3,neutral
+review_00038,farmer_0030,Rice,Quantity was less than ordered. Disappointed.,2,negative
+review_00039,farmer_0009,Banana,Decent quality. Will order again if price drops.,3,neutral
+review_00040,farmer_0001,Rice,Very fresh and organic. Highly recommended. Will buy again.,5,positive
+review_00041,farmer_0019,Rice,Good value for money. Will definitely reorder.,4,positive
+review_00042,farmer_0002,Tomato,Decent quality. Will order again if price drops. Recommended!,3,neutral
+review_00043,farmer_0021,Potato,Amazing farmer! Always delivers premium quality. Will buy again.,5,positive
+review_00044,farmer_0015,Tomato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00045,farmer_0046,Banana,Quantity was less than ordered. Disappointed.,2,negative
+review_00046,farmer_0037,Carrot,"Good produce, slightly overpriced but worth it.",4,positive
+review_00047,farmer_0018,Groundnut,Not satisfied. Price changed after ordering.,2,negative
+review_00048,farmer_0033,Carrot,Good value for money. Will definitely reorder.,4,positive
+review_00049,farmer_0023,Onion,Quantity was less than ordered. Disappointed.,2,negative
+review_00050,farmer_0025,Potato,Decent quality. Will order again if price drops.,3,neutral
+review_00051,farmer_0029,Cotton,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00052,farmer_0004,Tomato,Delivery was late but produce quality was good.,3,neutral
+review_00053,farmer_0009,Rice,Average quality. Onions had some bad ones mixed in. Recommended!,3,neutral
+review_00054,farmer_0003,Chilli,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00055,farmer_0029,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00056,farmer_0007,Potato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00057,farmer_0034,Carrot,Delivery was late but produce quality was good. Not ordering again.,3,neutral
+review_00058,farmer_0007,Cauliflower,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00059,farmer_0011,Cotton,Decent quality. Will order again if price drops.,3,neutral
+review_00060,farmer_0001,Chilli,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00061,farmer_0028,Tomato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00062,farmer_0008,Cabbage,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00063,farmer_0032,Lady Finger,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00064,farmer_0032,Coconut,Decent quality. Will order again if price drops. Not ordering again.,3,neutral
+review_00065,farmer_0025,Cotton,Amazing farmer! Always delivers premium quality. Delivery took too long.,5,positive
+review_00066,farmer_0021,Potato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00067,farmer_0021,Cabbage,Quantity was less than ordered. Disappointed.,2,negative
+review_00068,farmer_0019,Banana,Decent quality. Will order again if price drops.,3,neutral
+review_00069,farmer_0011,Cotton,Outstanding! Best rice I have ever bought online. Will buy again.,5,positive
+review_00070,farmer_0010,Banana,Outstanding! Best rice I have ever bought online.,5,positive
+review_00071,farmer_0026,Rice,Decent quality. Will order again if price drops.,3,neutral
+review_00072,farmer_0016,Brinjal,Fresh and clean vegetables. Packaging was great. Price was fair.,4,positive
+review_00073,farmer_0003,Rice,"Good produce, slightly overpriced but worth it.",4,positive
+review_00074,farmer_0008,Cauliflower,"Good produce, slightly overpriced but worth it.",4,positive
+review_00075,farmer_0025,Coconut,Decent quality. Will order again if price drops. Will buy again.,3,neutral
+review_00076,farmer_0008,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00077,farmer_0039,Cotton,Outstanding! Best rice I have ever bought online.,5,positive
+review_00078,farmer_0027,Tomato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00079,farmer_0030,Cauliflower,Very fresh and organic. Highly recommended. Not ordering again.,5,positive
+review_00080,farmer_0033,Carrot,Good value for money. Will definitely reorder.,4,positive
+review_00081,farmer_0007,Cabbage,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00082,farmer_0040,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00083,farmer_0025,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00084,farmer_0020,Sugarcane,Not satisfied. Price changed after ordering.,2,negative
+review_00085,farmer_0036,Coconut,Quantity was less than ordered. Disappointed.,2,negative
+review_00086,farmer_0003,Rice,Good value for money. Will definitely reorder. Recommended!,4,positive
+review_00087,farmer_0013,Cotton,Outstanding! Best rice I have ever bought online. Recommended!,5,positive
+review_00088,farmer_0008,Cabbage,"Good produce, slightly overpriced but worth it.",4,positive
+review_00089,farmer_0007,Banana,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00090,farmer_0022,Cauliflower,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00091,farmer_0015,Potato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00092,farmer_0029,Cabbage,Delivery was late but produce quality was good.,3,neutral
+review_00093,farmer_0020,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00094,farmer_0027,Tomato,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00095,farmer_0004,Cotton,Amazing farmer! Always delivers premium quality.,5,positive
+review_00096,farmer_0007,Banana,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00097,farmer_0030,Lady Finger,Not satisfied. Price changed after ordering.,2,negative
+review_00098,farmer_0007,Banana,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00099,farmer_0049,Cauliflower,Good value for money. Will definitely reorder.,4,positive
+review_00100,farmer_0009,Cotton,Very fresh and organic. Highly recommended. Price was fair.,5,positive
+review_00101,farmer_0043,Brinjal,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00102,farmer_0030,Sugarcane,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00103,farmer_0029,Banana,Outstanding! Best rice I have ever bought online. Will buy again.,5,positive
+review_00104,farmer_0038,Carrot,Outstanding! Best rice I have ever bought online.,5,positive
+review_00105,farmer_0029,Tomato,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00106,farmer_0016,Carrot,Amazing farmer! Always delivers premium quality.,5,positive
+review_00107,farmer_0026,Sugarcane,"Good produce, slightly overpriced but worth it.",4,positive
+review_00108,farmer_0041,Groundnut,Amazing farmer! Always delivers premium quality. Will buy again.,5,positive
+review_00109,farmer_0002,Rice,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00110,farmer_0029,Chilli,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00111,farmer_0045,Coconut,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00112,farmer_0026,Rice,Decent quality. Will order again if price drops. Price was fair.,3,neutral
+review_00113,farmer_0003,Onion,"Good produce, slightly overpriced but worth it.",4,positive
+review_00114,farmer_0039,Groundnut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00115,farmer_0027,Cotton,Not satisfied. Price changed after ordering.,2,negative
+review_00116,farmer_0026,Tomato,"Good produce, slightly overpriced but worth it. Will buy again.",4,positive
+review_00117,farmer_0002,Tomato,Very fresh and organic. Highly recommended.,5,positive
+review_00118,farmer_0034,Groundnut,Outstanding! Best rice I have ever bought online.,5,positive
+review_00119,farmer_0036,Groundnut,Quantity was less than ordered. Disappointed.,2,negative
+review_00120,farmer_0038,Cabbage,Good value for money. Will definitely reorder.,4,positive
+review_00121,farmer_0033,Banana,Decent quality. Will order again if price drops.,3,neutral
+review_00122,farmer_0042,Rice,Decent quality. Will order again if price drops. Recommended!,3,neutral
+review_00123,farmer_0002,Tomato,Very fresh and organic. Highly recommended.,5,positive
+review_00124,farmer_0030,Tomato,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00125,farmer_0049,Cabbage,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00126,farmer_0021,Carrot,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00127,farmer_0013,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00128,farmer_0003,Brinjal,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00129,farmer_0029,Onion,Decent quality. Will order again if price drops. Recommended!,3,neutral
+review_00130,farmer_0028,Cabbage,Amazing farmer! Always delivers premium quality.,5,positive
+review_00131,farmer_0018,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00132,farmer_0018,Banana,Excellent quality tomatoes! Very fresh and delivered on time. Recommended!,5,positive
+review_00133,farmer_0022,Cabbage,Outstanding! Best rice I have ever bought online. Not ordering again.,5,positive
+review_00134,farmer_0018,Rice,Amazing farmer! Always delivers premium quality.,5,positive
+review_00135,farmer_0020,Coconut,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00136,farmer_0045,Cauliflower,Amazing farmer! Always delivers premium quality.,5,positive
+review_00137,farmer_0011,Rice,Delivery was late but produce quality was good.,3,neutral
+review_00138,farmer_0031,Cotton,Amazing farmer! Always delivers premium quality.,5,positive
+review_00139,farmer_0047,Rice,Not satisfied. Price changed after ordering. Will buy again.,2,negative
+review_00140,farmer_0049,Tomato,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00141,farmer_0038,Carrot,Outstanding! Best rice I have ever bought online.,5,positive
+review_00142,farmer_0026,Chilli,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00143,farmer_0046,Onion,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00144,farmer_0042,Cabbage,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00145,farmer_0014,Carrot,Quantity was less than ordered. Disappointed. Price was fair.,2,negative
+review_00146,farmer_0028,Sugarcane,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00147,farmer_0032,Sugarcane,Love the eco-friendly packaging. Vegetables are fresh. Delivery took too long.,5,positive
+review_00148,farmer_0048,Cotton,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00149,farmer_0034,Groundnut,Decent quality. Will order again if price drops.,3,neutral
+review_00150,farmer_0043,Rice,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00151,farmer_0031,Coconut,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00152,farmer_0030,Coconut,Good value for money. Will definitely reorder.,4,positive
+review_00153,farmer_0016,Banana,"Good produce, slightly overpriced but worth it. Recommended!",4,positive
+review_00154,farmer_0049,Brinjal,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00155,farmer_0029,Cauliflower,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00156,farmer_0024,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00157,farmer_0031,Cabbage,Decent quality. Will order again if price drops.,3,neutral
+review_00158,farmer_0030,Carrot,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00159,farmer_0025,Potato,Average quality. Onions had some bad ones mixed in. Recommended!,3,neutral
+review_00160,farmer_0036,Carrot,Delivery was late but produce quality was good. Delivery took too long.,3,neutral
+review_00161,farmer_0024,Cotton,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00162,farmer_0026,Rice,Outstanding! Best rice I have ever bought online.,5,positive
+review_00163,farmer_0045,Carrot,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00164,farmer_0043,Coconut,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00165,farmer_0032,Tomato,Not satisfied. Price changed after ordering.,2,negative
+review_00166,farmer_0039,Sugarcane,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00167,farmer_0031,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00168,farmer_0047,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00169,farmer_0048,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00170,farmer_0009,Carrot,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00171,farmer_0004,Chilli,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00172,farmer_0012,Groundnut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00173,farmer_0008,Coconut,Excellent quality tomatoes! Very fresh and delivered on time. Recommended!,5,positive
+review_00174,farmer_0006,Cabbage,Good value for money. Will definitely reorder.,4,positive
+review_00175,farmer_0027,Onion,Delivery was late but produce quality was good.,3,neutral
+review_00176,farmer_0013,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00177,farmer_0050,Sugarcane,Outstanding! Best rice I have ever bought online.,5,positive
+review_00178,farmer_0006,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00179,farmer_0001,Tomato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00180,farmer_0033,Potato,Not satisfied. Price changed after ordering.,2,negative
+review_00181,farmer_0034,Cabbage,Not satisfied. Price changed after ordering.,2,negative
+review_00182,farmer_0025,Cabbage,Outstanding! Best rice I have ever bought online.,5,positive
+review_00183,farmer_0049,Coconut,Amazing farmer! Always delivers premium quality.,5,positive
+review_00184,farmer_0046,Cabbage,Not satisfied. Price changed after ordering.,2,negative
+review_00185,farmer_0031,Potato,Decent quality. Will order again if price drops.,3,neutral
+review_00186,farmer_0014,Onion,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00187,farmer_0034,Onion,Excellent quality tomatoes! Very fresh and delivered on time. Not ordering again.,5,positive
+review_00188,farmer_0030,Coconut,Quantity was less than ordered. Disappointed.,2,negative
+review_00189,farmer_0027,Cabbage,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00190,farmer_0021,Sugarcane,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00191,farmer_0009,Onion,Very fresh and organic. Highly recommended. Will buy again.,5,positive
+review_00192,farmer_0036,Potato,Good value for money. Will definitely reorder.,4,positive
+review_00193,farmer_0014,Cotton,Love the eco-friendly packaging. Vegetables are fresh. Price was fair.,5,positive
+review_00194,farmer_0026,Cabbage,"Good produce, slightly overpriced but worth it.",4,positive
+review_00195,farmer_0005,Coconut,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00196,farmer_0046,Rice,Not satisfied. Price changed after ordering.,2,negative
+review_00197,farmer_0027,Banana,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00198,farmer_0039,Rice,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00199,farmer_0021,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00200,farmer_0005,Groundnut,Not satisfied. Price changed after ordering.,2,negative
+review_00201,farmer_0018,Tomato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00202,farmer_0037,Coconut,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00203,farmer_0047,Rice,"Good produce, slightly overpriced but worth it.",4,positive
+review_00204,farmer_0009,Cotton,Not satisfied. Price changed after ordering. Not ordering again.,2,negative
+review_00205,farmer_0041,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00206,farmer_0007,Potato,Very fresh and organic. Highly recommended.,5,positive
+review_00207,farmer_0016,Brinjal,Very fresh and organic. Highly recommended.,5,positive
+review_00208,farmer_0037,Chilli,Amazing farmer! Always delivers premium quality. Delivery took too long.,5,positive
+review_00209,farmer_0012,Chilli,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00210,farmer_0027,Cotton,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00211,farmer_0018,Cotton,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00212,farmer_0048,Coconut,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00213,farmer_0047,Lady Finger,Very fresh and organic. Highly recommended.,5,positive
+review_00214,farmer_0008,Onion,Very fresh and organic. Highly recommended.,5,positive
+review_00215,farmer_0015,Rice,Outstanding! Best rice I have ever bought online.,5,positive
+review_00216,farmer_0002,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00217,farmer_0021,Lady Finger,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00218,farmer_0022,Chilli,Quantity was less than ordered. Disappointed.,2,negative
+review_00219,farmer_0044,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00220,farmer_0050,Coconut,Good value for money. Will definitely reorder.,4,positive
+review_00221,farmer_0011,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00222,farmer_0040,Tomato,Quantity was less than ordered. Disappointed.,2,negative
+review_00223,farmer_0037,Onion,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00224,farmer_0025,Rice,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00225,farmer_0012,Cauliflower,Quantity was less than ordered. Disappointed. Price was fair.,2,negative
+review_00226,farmer_0026,Sugarcane,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00227,farmer_0021,Lady Finger,Excellent quality tomatoes! Very fresh and delivered on time. Will buy again.,5,positive
+review_00228,farmer_0012,Carrot,Outstanding! Best rice I have ever bought online. Recommended!,5,positive
+review_00229,farmer_0040,Carrot,Delivery was late but produce quality was good.,3,neutral
+review_00230,farmer_0030,Cotton,Amazing farmer! Always delivers premium quality.,5,positive
+review_00231,farmer_0037,Rice,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00232,farmer_0032,Cabbage,Amazing farmer! Always delivers premium quality.,5,positive
+review_00233,farmer_0023,Onion,Amazing farmer! Always delivers premium quality.,5,positive
+review_00234,farmer_0010,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00235,farmer_0044,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00236,farmer_0026,Cauliflower,"Good produce, slightly overpriced but worth it. Will buy again.",4,positive
+review_00237,farmer_0028,Potato,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00238,farmer_0042,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00239,farmer_0007,Potato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00240,farmer_0019,Sugarcane,Delivery was late but produce quality was good.,3,neutral
+review_00241,farmer_0002,Cotton,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00242,farmer_0024,Groundnut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00243,farmer_0045,Potato,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00244,farmer_0041,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00245,farmer_0033,Brinjal,Not satisfied. Price changed after ordering.,2,negative
+review_00246,farmer_0011,Cotton,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00247,farmer_0044,Sugarcane,"Good produce, slightly overpriced but worth it. Price was fair.",4,positive
+review_00248,farmer_0006,Potato,Decent quality. Will order again if price drops.,3,neutral
+review_00249,farmer_0046,Groundnut,Not satisfied. Price changed after ordering.,2,negative
+review_00250,farmer_0019,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00251,farmer_0031,Potato,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00252,farmer_0002,Lady Finger,Excellent quality tomatoes! Very fresh and delivered on time. Price was fair.,5,positive
+review_00253,farmer_0017,Cabbage,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00254,farmer_0032,Carrot,Not satisfied. Price changed after ordering. Will buy again.,2,negative
+review_00255,farmer_0014,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00256,farmer_0011,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00257,farmer_0023,Chilli,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00258,farmer_0002,Tomato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00259,farmer_0003,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00260,farmer_0045,Lady Finger,"Good produce, slightly overpriced but worth it.",4,positive
+review_00261,farmer_0009,Groundnut,Good value for money. Will definitely reorder. Will buy again.,4,positive
+review_00262,farmer_0001,Rice,Love the eco-friendly packaging. Vegetables are fresh. Recommended!,5,positive
+review_00263,farmer_0009,Potato,Very fresh and organic. Highly recommended. Price was fair.,5,positive
+review_00264,farmer_0010,Sugarcane,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00265,farmer_0001,Sugarcane,Not satisfied. Price changed after ordering.,2,negative
+review_00266,farmer_0044,Potato,Love the eco-friendly packaging. Vegetables are fresh. Not ordering again.,5,positive
+review_00267,farmer_0018,Rice,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00268,farmer_0014,Carrot,Quantity was less than ordered. Disappointed.,2,negative
+review_00269,farmer_0050,Carrot,"Good produce, slightly overpriced but worth it.",4,positive
+review_00270,farmer_0036,Tomato,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00271,farmer_0027,Sugarcane,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00272,farmer_0028,Carrot,Very fresh and organic. Highly recommended. Price was fair.,5,positive
+review_00273,farmer_0031,Sugarcane,Very fresh and organic. Highly recommended.,5,positive
+review_00274,farmer_0016,Rice,Not satisfied. Price changed after ordering.,2,negative
+review_00275,farmer_0018,Cauliflower,"Quality inconsistent. Sometimes good, sometimes bad. Not ordering again.",3,neutral
+review_00276,farmer_0025,Onion,Outstanding! Best rice I have ever bought online. Recommended!,5,positive
+review_00277,farmer_0038,Brinjal,Very fresh and organic. Highly recommended.,5,positive
+review_00278,farmer_0019,Banana,Excellent quality tomatoes! Very fresh and delivered on time. Delivery took too long.,5,positive
+review_00279,farmer_0036,Tomato,Good value for money. Will definitely reorder.,4,positive
+review_00280,farmer_0042,Onion,"Good produce, slightly overpriced but worth it.",4,positive
+review_00281,farmer_0010,Carrot,Quantity was less than ordered. Disappointed.,2,negative
+review_00282,farmer_0011,Lady Finger,Very fresh and organic. Highly recommended.,5,positive
+review_00283,farmer_0019,Onion,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00284,farmer_0021,Cabbage,"Good produce, slightly overpriced but worth it.",4,positive
+review_00285,farmer_0027,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00286,farmer_0027,Onion,Amazing farmer! Always delivers premium quality.,5,positive
+review_00287,farmer_0013,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00288,farmer_0046,Chilli,Delivery was late but produce quality was good.,3,neutral
+review_00289,farmer_0045,Potato,Delivery was late but produce quality was good. Will buy again.,3,neutral
+review_00290,farmer_0036,Cauliflower,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00291,farmer_0036,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00292,farmer_0041,Banana,Quantity was less than ordered. Disappointed.,2,negative
+review_00293,farmer_0018,Sugarcane,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00294,farmer_0046,Banana,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00295,farmer_0012,Chilli,Quantity was less than ordered. Disappointed.,2,negative
+review_00296,farmer_0013,Carrot,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00297,farmer_0006,Onion,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00298,farmer_0011,Cabbage,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00299,farmer_0044,Groundnut,Delivery was late but produce quality was good.,3,neutral
+review_00300,farmer_0046,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00301,farmer_0026,Tomato,Decent quality. Will order again if price drops.,3,neutral
+review_00302,farmer_0018,Lady Finger,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00303,farmer_0002,Banana,Amazing farmer! Always delivers premium quality. Will buy again.,5,positive
+review_00304,farmer_0035,Cauliflower,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00305,farmer_0046,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00306,farmer_0035,Groundnut,Amazing farmer! Always delivers premium quality.,5,positive
+review_00307,farmer_0020,Cabbage,"Good produce, slightly overpriced but worth it.",4,positive
+review_00308,farmer_0015,Chilli,Love the eco-friendly packaging. Vegetables are fresh. Delivery took too long.,5,positive
+review_00309,farmer_0045,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00310,farmer_0024,Carrot,Outstanding! Best rice I have ever bought online.,5,positive
+review_00311,farmer_0048,Cotton,Love the eco-friendly packaging. Vegetables are fresh. Not ordering again.,5,positive
+review_00312,farmer_0029,Chilli,Delivery was late but produce quality was good.,3,neutral
+review_00313,farmer_0039,Cabbage,Quantity was less than ordered. Disappointed.,2,negative
+review_00314,farmer_0029,Carrot,"Good produce, slightly overpriced but worth it. Will buy again.",4,positive
+review_00315,farmer_0002,Sugarcane,Good value for money. Will definitely reorder.,4,positive
+review_00316,farmer_0030,Groundnut,Outstanding! Best rice I have ever bought online.,5,positive
+review_00317,farmer_0017,Chilli,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00318,farmer_0007,Onion,Good value for money. Will definitely reorder.,4,positive
+review_00319,farmer_0023,Lady Finger,Very fresh and organic. Highly recommended. Delivery took too long.,5,positive
+review_00320,farmer_0003,Cotton,Amazing farmer! Always delivers premium quality.,5,positive
+review_00321,farmer_0043,Cauliflower,Good value for money. Will definitely reorder. Not ordering again.,4,positive
+review_00322,farmer_0013,Groundnut,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00323,farmer_0050,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00324,farmer_0013,Banana,Excellent quality tomatoes! Very fresh and delivered on time. Delivery took too long.,5,positive
+review_00325,farmer_0048,Onion,Quantity was less than ordered. Disappointed.,2,negative
+review_00326,farmer_0041,Carrot,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00327,farmer_0040,Sugarcane,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00328,farmer_0018,Groundnut,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00329,farmer_0048,Rice,Love the eco-friendly packaging. Vegetables are fresh. Recommended!,5,positive
+review_00330,farmer_0039,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00331,farmer_0039,Potato,Not satisfied. Price changed after ordering.,2,negative
+review_00332,farmer_0045,Groundnut,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00333,farmer_0014,Lady Finger,Love the eco-friendly packaging. Vegetables are fresh. Will buy again.,5,positive
+review_00334,farmer_0035,Cauliflower,Not satisfied. Price changed after ordering.,2,negative
+review_00335,farmer_0010,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00336,farmer_0036,Cabbage,Delivery was late but produce quality was good.,3,neutral
+review_00337,farmer_0033,Coconut,Amazing farmer! Always delivers premium quality.,5,positive
+review_00338,farmer_0050,Banana,"Good produce, slightly overpriced but worth it.",4,positive
+review_00339,farmer_0030,Groundnut,Good value for money. Will definitely reorder. Delivery took too long.,4,positive
+review_00340,farmer_0001,Coconut,Fresh and clean vegetables. Packaging was great. Delivery took too long.,4,positive
+review_00341,farmer_0032,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00342,farmer_0040,Cabbage,Outstanding! Best rice I have ever bought online.,5,positive
+review_00343,farmer_0042,Cabbage,Good value for money. Will definitely reorder.,4,positive
+review_00344,farmer_0021,Brinjal,Outstanding! Best rice I have ever bought online.,5,positive
+review_00345,farmer_0043,Banana,Not satisfied. Price changed after ordering.,2,negative
+review_00346,farmer_0018,Onion,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00347,farmer_0029,Groundnut,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00348,farmer_0011,Sugarcane,Amazing farmer! Always delivers premium quality.,5,positive
+review_00349,farmer_0019,Coconut,Very fresh and organic. Highly recommended. Not ordering again.,5,positive
+review_00350,farmer_0023,Carrot,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00351,farmer_0002,Cauliflower,"Good produce, slightly overpriced but worth it.",4,positive
+review_00352,farmer_0016,Chilli,Good value for money. Will definitely reorder.,4,positive
+review_00353,farmer_0033,Rice,Amazing farmer! Always delivers premium quality.,5,positive
+review_00354,farmer_0022,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00355,farmer_0037,Sugarcane,Not satisfied. Price changed after ordering.,2,negative
+review_00356,farmer_0039,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00357,farmer_0028,Chilli,Good value for money. Will definitely reorder.,4,positive
+review_00358,farmer_0029,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00359,farmer_0022,Groundnut,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00360,farmer_0036,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00361,farmer_0020,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00362,farmer_0044,Tomato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00363,farmer_0045,Rice,Quantity was less than ordered. Disappointed.,2,negative
+review_00364,farmer_0042,Coconut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00365,farmer_0030,Brinjal,"Good produce, slightly overpriced but worth it.",4,positive
+review_00366,farmer_0021,Coconut,Very fresh and organic. Highly recommended. Will buy again.,5,positive
+review_00367,farmer_0001,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00368,farmer_0025,Carrot,Decent quality. Will order again if price drops.,3,neutral
+review_00369,farmer_0046,Sugarcane,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00370,farmer_0001,Rice,Decent quality. Will order again if price drops.,3,neutral
+review_00371,farmer_0038,Carrot,Love the eco-friendly packaging. Vegetables are fresh. Delivery took too long.,5,positive
+review_00372,farmer_0022,Coconut,Delivery was late but produce quality was good. Delivery took too long.,3,neutral
+review_00373,farmer_0015,Onion,Good value for money. Will definitely reorder. Will buy again.,4,positive
+review_00374,farmer_0009,Cauliflower,Good value for money. Will definitely reorder.,4,positive
+review_00375,farmer_0026,Chilli,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00376,farmer_0021,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00377,farmer_0008,Banana,Not satisfied. Price changed after ordering.,2,negative
+review_00378,farmer_0017,Carrot,Amazing farmer! Always delivers premium quality.,5,positive
+review_00379,farmer_0009,Rice,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00380,farmer_0005,Banana,Outstanding! Best rice I have ever bought online.,5,positive
+review_00381,farmer_0022,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00382,farmer_0046,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00383,farmer_0045,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00384,farmer_0010,Tomato,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00385,farmer_0031,Banana,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00386,farmer_0017,Cauliflower,"Good produce, slightly overpriced but worth it. Not ordering again.",4,positive
+review_00387,farmer_0037,Banana,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00388,farmer_0026,Onion,Good value for money. Will definitely reorder.,4,positive
+review_00389,farmer_0037,Rice,Good value for money. Will definitely reorder. Delivery took too long.,4,positive
+review_00390,farmer_0006,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00391,farmer_0047,Cotton,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00392,farmer_0021,Tomato,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00393,farmer_0007,Cauliflower,Quantity was less than ordered. Disappointed.,2,negative
+review_00394,farmer_0035,Coconut,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00395,farmer_0041,Tomato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00396,farmer_0019,Groundnut,Delivery was late but produce quality was good.,3,neutral
+review_00397,farmer_0016,Coconut,Decent quality. Will order again if price drops.,3,neutral
+review_00398,farmer_0024,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00399,farmer_0022,Carrot,Delivery was late but produce quality was good.,3,neutral
+review_00400,farmer_0014,Sugarcane,Delivery was late but produce quality was good. Price was fair.,3,neutral
+review_00401,farmer_0032,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00402,farmer_0039,Cotton,Quantity was less than ordered. Disappointed.,2,negative
+review_00403,farmer_0014,Rice,Not satisfied. Price changed after ordering.,2,negative
+review_00404,farmer_0013,Carrot,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00405,farmer_0017,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00406,farmer_0002,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00407,farmer_0016,Groundnut,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00408,farmer_0043,Cabbage,Amazing farmer! Always delivers premium quality.,5,positive
+review_00409,farmer_0037,Tomato,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00410,farmer_0012,Potato,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00411,farmer_0024,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00412,farmer_0030,Cotton,Not satisfied. Price changed after ordering. Recommended!,2,negative
+review_00413,farmer_0002,Cauliflower,Amazing farmer! Always delivers premium quality. Price was fair.,5,positive
+review_00414,farmer_0044,Onion,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00415,farmer_0038,Cabbage,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00416,farmer_0003,Brinjal,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00417,farmer_0011,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00418,farmer_0047,Onion,"Good produce, slightly overpriced but worth it.",4,positive
+review_00419,farmer_0044,Rice,Decent quality. Will order again if price drops.,3,neutral
+review_00420,farmer_0015,Carrot,Good value for money. Will definitely reorder.,4,positive
+review_00421,farmer_0005,Sugarcane,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00422,farmer_0042,Carrot,Amazing farmer! Always delivers premium quality. Price was fair.,5,positive
+review_00423,farmer_0015,Tomato,Average quality. Onions had some bad ones mixed in. Not ordering again.,3,neutral
+review_00424,farmer_0027,Tomato,Quantity was less than ordered. Disappointed. Will buy again.,2,negative
+review_00425,farmer_0009,Cauliflower,"Quality inconsistent. Sometimes good, sometimes bad. Delivery took too long.",3,neutral
+review_00426,farmer_0042,Brinjal,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00427,farmer_0012,Brinjal,Quantity was less than ordered. Disappointed.,2,negative
+review_00428,farmer_0040,Lady Finger,Good value for money. Will definitely reorder. Not ordering again.,4,positive
+review_00429,farmer_0035,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00430,farmer_0011,Cauliflower,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00431,farmer_0004,Groundnut,Decent quality. Will order again if price drops.,3,neutral
+review_00432,farmer_0045,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00433,farmer_0011,Groundnut,Fresh and clean vegetables. Packaging was great. Recommended!,4,positive
+review_00434,farmer_0019,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00435,farmer_0024,Lady Finger,Very fresh and organic. Highly recommended.,5,positive
+review_00436,farmer_0048,Cauliflower,Amazing farmer! Always delivers premium quality.,5,positive
+review_00437,farmer_0001,Cabbage,Outstanding! Best rice I have ever bought online.,5,positive
+review_00438,farmer_0045,Cabbage,Amazing farmer! Always delivers premium quality.,5,positive
+review_00439,farmer_0017,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00440,farmer_0017,Cauliflower,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00441,farmer_0012,Chilli,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00442,farmer_0030,Sugarcane,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00443,farmer_0036,Cauliflower,Outstanding! Best rice I have ever bought online.,5,positive
+review_00444,farmer_0001,Cotton,Decent quality. Will order again if price drops. Price was fair.,3,neutral
+review_00445,farmer_0018,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00446,farmer_0030,Cotton,Delivery was late but produce quality was good.,3,neutral
+review_00447,farmer_0006,Potato,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00448,farmer_0033,Carrot,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00449,farmer_0010,Lady Finger,Quantity was less than ordered. Disappointed.,2,negative
+review_00450,farmer_0004,Cotton,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00451,farmer_0026,Coconut,Amazing farmer! Always delivers premium quality. Will buy again.,5,positive
+review_00452,farmer_0017,Onion,Fresh and clean vegetables. Packaging was great. Price was fair.,4,positive
+review_00453,farmer_0013,Cabbage,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00454,farmer_0028,Tomato,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00455,farmer_0046,Groundnut,Delivery was late but produce quality was good.,3,neutral
+review_00456,farmer_0013,Onion,Decent quality. Will order again if price drops.,3,neutral
+review_00457,farmer_0042,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00458,farmer_0031,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00459,farmer_0041,Onion,Amazing farmer! Always delivers premium quality.,5,positive
+review_00460,farmer_0034,Rice,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00461,farmer_0049,Cotton,Love the eco-friendly packaging. Vegetables are fresh. Will buy again.,5,positive
+review_00462,farmer_0016,Chilli,Outstanding! Best rice I have ever bought online. Not ordering again.,5,positive
+review_00463,farmer_0006,Cabbage,Not satisfied. Price changed after ordering.,2,negative
+review_00464,farmer_0006,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00465,farmer_0036,Coconut,Amazing farmer! Always delivers premium quality. Delivery took too long.,5,positive
+review_00466,farmer_0034,Brinjal,Outstanding! Best rice I have ever bought online.,5,positive
+review_00467,farmer_0008,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00468,farmer_0050,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00469,farmer_0007,Chilli,Not satisfied. Price changed after ordering.,2,negative
+review_00470,farmer_0042,Onion,Average quality. Onions had some bad ones mixed in. Price was fair.,3,neutral
+review_00471,farmer_0031,Cabbage,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00472,farmer_0015,Groundnut,Outstanding! Best rice I have ever bought online. Will buy again.,5,positive
+review_00473,farmer_0047,Brinjal,Decent quality. Will order again if price drops.,3,neutral
+review_00474,farmer_0045,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00475,farmer_0027,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00476,farmer_0006,Tomato,Not satisfied. Price changed after ordering. Recommended!,2,negative
+review_00477,farmer_0001,Tomato,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00478,farmer_0007,Brinjal,Not satisfied. Price changed after ordering.,2,negative
+review_00479,farmer_0002,Sugarcane,Decent quality. Will order again if price drops.,3,neutral
+review_00480,farmer_0010,Chilli,Average quality. Onions had some bad ones mixed in. Recommended!,3,neutral
+review_00481,farmer_0011,Coconut,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00482,farmer_0015,Sugarcane,Good value for money. Will definitely reorder.,4,positive
+review_00483,farmer_0003,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00484,farmer_0012,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00485,farmer_0024,Cauliflower,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00486,farmer_0031,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00487,farmer_0045,Coconut,Not satisfied. Price changed after ordering.,2,negative
+review_00488,farmer_0022,Coconut,Not satisfied. Price changed after ordering.,2,negative
+review_00489,farmer_0028,Chilli,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00490,farmer_0029,Sugarcane,Amazing farmer! Always delivers premium quality.,5,positive
+review_00491,farmer_0023,Potato,Outstanding! Best rice I have ever bought online. Will buy again.,5,positive
+review_00492,farmer_0044,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00493,farmer_0043,Coconut,Good value for money. Will definitely reorder.,4,positive
+review_00494,farmer_0026,Banana,Average quality. Onions had some bad ones mixed in. Recommended!,3,neutral
+review_00495,farmer_0047,Rice,"Good produce, slightly overpriced but worth it.",4,positive
+review_00496,farmer_0006,Cauliflower,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00497,farmer_0016,Brinjal,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00498,farmer_0040,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00499,farmer_0028,Cotton,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00500,farmer_0037,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00501,farmer_0029,Groundnut,Good value for money. Will definitely reorder.,4,positive
+review_00502,farmer_0050,Cauliflower,Decent quality. Will order again if price drops. Price was fair.,3,neutral
+review_00503,farmer_0021,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00504,farmer_0030,Banana,Quantity was less than ordered. Disappointed.,2,negative
+review_00505,farmer_0024,Lady Finger,Amazing farmer! Always delivers premium quality.,5,positive
+review_00506,farmer_0026,Lady Finger,Outstanding! Best rice I have ever bought online.,5,positive
+review_00507,farmer_0038,Carrot,Decent quality. Will order again if price drops. Not ordering again.,3,neutral
+review_00508,farmer_0014,Cabbage,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00509,farmer_0026,Potato,Good value for money. Will definitely reorder.,4,positive
+review_00510,farmer_0044,Chilli,Outstanding! Best rice I have ever bought online.,5,positive
+review_00511,farmer_0002,Carrot,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00512,farmer_0028,Rice,Amazing farmer! Always delivers premium quality.,5,positive
+review_00513,farmer_0021,Potato,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00514,farmer_0007,Onion,Quantity was less than ordered. Disappointed.,2,negative
+review_00515,farmer_0045,Lady Finger,Love the eco-friendly packaging. Vegetables are fresh. Recommended!,5,positive
+review_00516,farmer_0005,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00517,farmer_0028,Cauliflower,Outstanding! Best rice I have ever bought online.,5,positive
+review_00518,farmer_0043,Sugarcane,Decent quality. Will order again if price drops.,3,neutral
+review_00519,farmer_0011,Onion,Delivery was late but produce quality was good.,3,neutral
+review_00520,farmer_0037,Groundnut,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00521,farmer_0014,Tomato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00522,farmer_0047,Sugarcane,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00523,farmer_0045,Cauliflower,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00524,farmer_0049,Tomato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00525,farmer_0017,Potato,Love the eco-friendly packaging. Vegetables are fresh. Price was fair.,5,positive
+review_00526,farmer_0032,Coconut,Delivery was late but produce quality was good.,3,neutral
+review_00527,farmer_0022,Banana,Love the eco-friendly packaging. Vegetables are fresh. Not ordering again.,5,positive
+review_00528,farmer_0037,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00529,farmer_0031,Cauliflower,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00530,farmer_0007,Sugarcane,Good value for money. Will definitely reorder.,4,positive
+review_00531,farmer_0049,Cotton,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00532,farmer_0044,Banana,Outstanding! Best rice I have ever bought online.,5,positive
+review_00533,farmer_0018,Brinjal,Amazing farmer! Always delivers premium quality.,5,positive
+review_00534,farmer_0019,Potato,Outstanding! Best rice I have ever bought online.,5,positive
+review_00535,farmer_0007,Brinjal,Amazing farmer! Always delivers premium quality. Price was fair.,5,positive
+review_00536,farmer_0017,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00537,farmer_0012,Onion,Quantity was less than ordered. Disappointed.,2,negative
+review_00538,farmer_0030,Potato,Outstanding! Best rice I have ever bought online.,5,positive
+review_00539,farmer_0004,Cotton,Quantity was less than ordered. Disappointed.,2,negative
+review_00540,farmer_0010,Carrot,Outstanding! Best rice I have ever bought online.,5,positive
+review_00541,farmer_0028,Brinjal,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00542,farmer_0028,Carrot,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00543,farmer_0042,Carrot,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00544,farmer_0035,Lady Finger,Quantity was less than ordered. Disappointed.,2,negative
+review_00545,farmer_0022,Banana,Quantity was less than ordered. Disappointed.,2,negative
+review_00546,farmer_0017,Cauliflower,Outstanding! Best rice I have ever bought online.,5,positive
+review_00547,farmer_0005,Rice,Quantity was less than ordered. Disappointed.,2,negative
+review_00548,farmer_0009,Sugarcane,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00549,farmer_0045,Rice,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00550,farmer_0001,Sugarcane,Very fresh and organic. Highly recommended.,5,positive
+review_00551,farmer_0028,Potato,Delivery was late but produce quality was good.,3,neutral
+review_00552,farmer_0043,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00553,farmer_0017,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00554,farmer_0002,Onion,Love the eco-friendly packaging. Vegetables are fresh. Delivery took too long.,5,positive
+review_00555,farmer_0034,Banana,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00556,farmer_0016,Groundnut,Good value for money. Will definitely reorder. Delivery took too long.,4,positive
+review_00557,farmer_0023,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00558,farmer_0005,Chilli,"Good produce, slightly overpriced but worth it.",4,positive
+review_00559,farmer_0026,Potato,Very fresh and organic. Highly recommended.,5,positive
+review_00560,farmer_0004,Cotton,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00561,farmer_0022,Carrot,Quantity was less than ordered. Disappointed. Price was fair.,2,negative
+review_00562,farmer_0021,Rice,Outstanding! Best rice I have ever bought online.,5,positive
+review_00563,farmer_0009,Sugarcane,"Good produce, slightly overpriced but worth it.",4,positive
+review_00564,farmer_0020,Rice,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00565,farmer_0044,Potato,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00566,farmer_0042,Sugarcane,Good value for money. Will definitely reorder.,4,positive
+review_00567,farmer_0005,Lady Finger,Good value for money. Will definitely reorder.,4,positive
+review_00568,farmer_0011,Banana,Very fresh and organic. Highly recommended.,5,positive
+review_00569,farmer_0023,Groundnut,Outstanding! Best rice I have ever bought online.,5,positive
+review_00570,farmer_0007,Potato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00571,farmer_0045,Tomato,Not satisfied. Price changed after ordering. Delivery took too long.,2,negative
+review_00572,farmer_0012,Lady Finger,Quantity was less than ordered. Disappointed.,2,negative
+review_00573,farmer_0049,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00574,farmer_0027,Onion,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00575,farmer_0020,Chilli,Delivery was late but produce quality was good.,3,neutral
+review_00576,farmer_0022,Lady Finger,Amazing farmer! Always delivers premium quality.,5,positive
+review_00577,farmer_0023,Groundnut,Very fresh and organic. Highly recommended.,5,positive
+review_00578,farmer_0019,Onion,Delivery was late but produce quality was good.,3,neutral
+review_00579,farmer_0011,Coconut,Decent quality. Will order again if price drops.,3,neutral
+review_00580,farmer_0034,Potato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00581,farmer_0043,Lady Finger,Delivery was late but produce quality was good. Will buy again.,3,neutral
+review_00582,farmer_0028,Carrot,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00583,farmer_0021,Cabbage,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00584,farmer_0046,Carrot,Amazing farmer! Always delivers premium quality. Delivery took too long.,5,positive
+review_00585,farmer_0012,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00586,farmer_0045,Cabbage,Decent quality. Will order again if price drops.,3,neutral
+review_00587,farmer_0029,Cauliflower,Decent quality. Will order again if price drops.,3,neutral
+review_00588,farmer_0003,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00589,farmer_0044,Potato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00590,farmer_0036,Cabbage,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00591,farmer_0047,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00592,farmer_0002,Rice,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00593,farmer_0025,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00594,farmer_0009,Cotton,Very fresh and organic. Highly recommended.,5,positive
+review_00595,farmer_0048,Brinjal,Quantity was less than ordered. Disappointed.,2,negative
+review_00596,farmer_0028,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00597,farmer_0022,Potato,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00598,farmer_0048,Groundnut,Quantity was less than ordered. Disappointed. Price was fair.,2,negative
+review_00599,farmer_0010,Tomato,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00600,farmer_0031,Brinjal,Decent quality. Will order again if price drops.,3,neutral
+review_00601,farmer_0029,Onion,Decent quality. Will order again if price drops. Not ordering again.,3,neutral
+review_00602,farmer_0043,Lady Finger,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00603,farmer_0018,Coconut,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00604,farmer_0049,Cotton,Not satisfied. Price changed after ordering.,2,negative
+review_00605,farmer_0031,Rice,Not satisfied. Price changed after ordering.,2,negative
+review_00606,farmer_0012,Rice,Delivery was late but produce quality was good.,3,neutral
+review_00607,farmer_0032,Coconut,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00608,farmer_0004,Banana,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00609,farmer_0023,Sugarcane,Delivery was late but produce quality was good. Delivery took too long.,3,neutral
+review_00610,farmer_0004,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00611,farmer_0048,Coconut,Good value for money. Will definitely reorder.,4,positive
+review_00612,farmer_0011,Lady Finger,Not satisfied. Price changed after ordering.,2,negative
+review_00613,farmer_0029,Cauliflower,Delivery was late but produce quality was good.,3,neutral
+review_00614,farmer_0017,Tomato,Love the eco-friendly packaging. Vegetables are fresh. Will buy again.,5,positive
+review_00615,farmer_0010,Chilli,Good value for money. Will definitely reorder.,4,positive
+review_00616,farmer_0027,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00617,farmer_0045,Coconut,Amazing farmer! Always delivers premium quality.,5,positive
+review_00618,farmer_0029,Cauliflower,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00619,farmer_0042,Tomato,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00620,farmer_0031,Lady Finger,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00621,farmer_0005,Chilli,Decent quality. Will order again if price drops.,3,neutral
+review_00622,farmer_0041,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00623,farmer_0015,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00624,farmer_0022,Groundnut,Very fresh and organic. Highly recommended.,5,positive
+review_00625,farmer_0033,Coconut,Amazing farmer! Always delivers premium quality. Not ordering again.,5,positive
+review_00626,farmer_0048,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00627,farmer_0015,Rice,Very fresh and organic. Highly recommended.,5,positive
+review_00628,farmer_0040,Cabbage,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00629,farmer_0011,Banana,"Good produce, slightly overpriced but worth it.",4,positive
+review_00630,farmer_0023,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00631,farmer_0029,Tomato,Quantity was less than ordered. Disappointed.,2,negative
+review_00632,farmer_0028,Cauliflower,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00633,farmer_0017,Chilli,Average quality. Onions had some bad ones mixed in. Delivery took too long.,3,neutral
+review_00634,farmer_0044,Cabbage,Amazing farmer! Always delivers premium quality.,5,positive
+review_00635,farmer_0027,Banana,Outstanding! Best rice I have ever bought online.,5,positive
+review_00636,farmer_0002,Coconut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00637,farmer_0014,Tomato,Decent quality. Will order again if price drops.,3,neutral
+review_00638,farmer_0015,Cabbage,"Good produce, slightly overpriced but worth it. Recommended!",4,positive
+review_00639,farmer_0002,Sugarcane,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00640,farmer_0032,Onion,"Good produce, slightly overpriced but worth it. Delivery took too long.",4,positive
+review_00641,farmer_0010,Lady Finger,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00642,farmer_0036,Carrot,Terrible experience. Vegetables were rotten on arrival. Price was fair.,1,negative
+review_00643,farmer_0036,Cotton,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00644,farmer_0008,Chilli,"Good produce, slightly overpriced but worth it. Recommended!",4,positive
+review_00645,farmer_0018,Cabbage,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00646,farmer_0030,Tomato,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00647,farmer_0029,Brinjal,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00648,farmer_0030,Onion,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00649,farmer_0024,Carrot,Delivery was late but produce quality was good.,3,neutral
+review_00650,farmer_0024,Brinjal,Very fresh and organic. Highly recommended.,5,positive
+review_00651,farmer_0043,Cauliflower,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00652,farmer_0032,Chilli,Outstanding! Best rice I have ever bought online.,5,positive
+review_00653,farmer_0037,Chilli,Amazing farmer! Always delivers premium quality.,5,positive
+review_00654,farmer_0021,Cauliflower,Delivery was late but produce quality was good. Not ordering again.,3,neutral
+review_00655,farmer_0009,Carrot,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00656,farmer_0029,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00657,farmer_0019,Cauliflower,Outstanding! Best rice I have ever bought online.,5,positive
+review_00658,farmer_0040,Chilli,"Good produce, slightly overpriced but worth it.",4,positive
+review_00659,farmer_0009,Sugarcane,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00660,farmer_0024,Potato,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00661,farmer_0030,Cauliflower,Good value for money. Will definitely reorder.,4,positive
+review_00662,farmer_0042,Lady Finger,Not satisfied. Price changed after ordering.,2,negative
+review_00663,farmer_0005,Groundnut,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00664,farmer_0005,Carrot,Not satisfied. Price changed after ordering.,2,negative
+review_00665,farmer_0006,Banana,Not satisfied. Price changed after ordering.,2,negative
+review_00666,farmer_0032,Banana,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00667,farmer_0004,Cotton,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00668,farmer_0031,Coconut,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00669,farmer_0017,Brinjal,Very fresh and organic. Highly recommended.,5,positive
+review_00670,farmer_0010,Banana,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00671,farmer_0044,Cabbage,Excellent quality tomatoes! Very fresh and delivered on time. Not ordering again.,5,positive
+review_00672,farmer_0011,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Recommended!,1,negative
+review_00673,farmer_0019,Tomato,Outstanding! Best rice I have ever bought online.,5,positive
+review_00674,farmer_0038,Rice,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00675,farmer_0019,Coconut,Good value for money. Will definitely reorder.,4,positive
+review_00676,farmer_0002,Carrot,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00677,farmer_0036,Cauliflower,Outstanding! Best rice I have ever bought online. Recommended!,5,positive
+review_00678,farmer_0043,Potato,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00679,farmer_0021,Carrot,Delivery was late but produce quality was good.,3,neutral
+review_00680,farmer_0019,Cauliflower,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00681,farmer_0017,Onion,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00682,farmer_0042,Rice,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00683,farmer_0027,Tomato,Love the eco-friendly packaging. Vegetables are fresh. Not ordering again.,5,positive
+review_00684,farmer_0039,Onion,"Good produce, slightly overpriced but worth it.",4,positive
+review_00685,farmer_0048,Sugarcane,Good value for money. Will definitely reorder. Not ordering again.,4,positive
+review_00686,farmer_0046,Chilli,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00687,farmer_0039,Cotton,Quantity was less than ordered. Disappointed. Will buy again.,2,negative
+review_00688,farmer_0045,Potato,Not satisfied. Price changed after ordering.,2,negative
+review_00689,farmer_0035,Groundnut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00690,farmer_0019,Cabbage,"Good produce, slightly overpriced but worth it. Will buy again.",4,positive
+review_00691,farmer_0010,Tomato,Average quality. Onions had some bad ones mixed in. Recommended!,3,neutral
+review_00692,farmer_0045,Sugarcane,Good value for money. Will definitely reorder. Recommended!,4,positive
+review_00693,farmer_0015,Tomato,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00694,farmer_0036,Tomato,"Good produce, slightly overpriced but worth it. Not ordering again.",4,positive
+review_00695,farmer_0039,Tomato,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00696,farmer_0034,Sugarcane,Decent quality. Will order again if price drops.,3,neutral
+review_00697,farmer_0044,Groundnut,"Good produce, slightly overpriced but worth it.",4,positive
+review_00698,farmer_0011,Rice,Outstanding! Best rice I have ever bought online.,5,positive
+review_00699,farmer_0007,Coconut,"Good produce, slightly overpriced but worth it.",4,positive
+review_00700,farmer_0003,Lady Finger,Amazing farmer! Always delivers premium quality.,5,positive
+review_00701,farmer_0013,Chilli,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00702,farmer_0047,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00703,farmer_0010,Rice,Fresh and clean vegetables. Packaging was great. Price was fair.,4,positive
+review_00704,farmer_0041,Groundnut,Good value for money. Will definitely reorder.,4,positive
+review_00705,farmer_0046,Cauliflower,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00706,farmer_0031,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00707,farmer_0014,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00708,farmer_0006,Carrot,Decent quality. Will order again if price drops.,3,neutral
+review_00709,farmer_0049,Brinjal,"Good produce, slightly overpriced but worth it.",4,positive
+review_00710,farmer_0008,Rice,Outstanding! Best rice I have ever bought online. Recommended!,5,positive
+review_00711,farmer_0002,Cotton,Fresh and clean vegetables. Packaging was great. Will buy again.,4,positive
+review_00712,farmer_0018,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00713,farmer_0028,Tomato,Outstanding! Best rice I have ever bought online.,5,positive
+review_00714,farmer_0031,Cotton,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00715,farmer_0046,Brinjal,Very fresh and organic. Highly recommended.,5,positive
+review_00716,farmer_0046,Potato,Quantity was less than ordered. Disappointed.,2,negative
+review_00717,farmer_0042,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00718,farmer_0049,Sugarcane,Average quality. Onions had some bad ones mixed in. Price was fair.,3,neutral
+review_00719,farmer_0013,Coconut,Terrible experience. Vegetables were rotten on arrival. Recommended!,1,negative
+review_00720,farmer_0033,Sugarcane,Quantity was less than ordered. Disappointed.,2,negative
+review_00721,farmer_0021,Cotton,"Good produce, slightly overpriced but worth it. Recommended!",4,positive
+review_00722,farmer_0029,Cabbage,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00723,farmer_0049,Cabbage,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00724,farmer_0050,Rice,Amazing farmer! Always delivers premium quality.,5,positive
+review_00725,farmer_0030,Tomato,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00726,farmer_0039,Banana,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00727,farmer_0026,Groundnut,Very fresh and organic. Highly recommended.,5,positive
+review_00728,farmer_0046,Potato,Not satisfied. Price changed after ordering.,2,negative
+review_00729,farmer_0004,Tomato,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00730,farmer_0034,Cabbage,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00731,farmer_0038,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00732,farmer_0018,Coconut,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00733,farmer_0013,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00734,farmer_0002,Cotton,Average quality. Onions had some bad ones mixed in. Will buy again.,3,neutral
+review_00735,farmer_0035,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00736,farmer_0045,Lady Finger,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00737,farmer_0016,Brinjal,Decent quality. Will order again if price drops. Will buy again.,3,neutral
+review_00738,farmer_0001,Cabbage,Delivery was late but produce quality was good.,3,neutral
+review_00739,farmer_0010,Lady Finger,Amazing farmer! Always delivers premium quality.,5,positive
+review_00740,farmer_0035,Cabbage,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00741,farmer_0036,Chilli,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00742,farmer_0008,Rice,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00743,farmer_0037,Groundnut,Amazing farmer! Always delivers premium quality.,5,positive
+review_00744,farmer_0020,Lady Finger,Good value for money. Will definitely reorder. Will buy again.,4,positive
+review_00745,farmer_0028,Brinjal,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00746,farmer_0014,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00747,farmer_0026,Cauliflower,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00748,farmer_0013,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00749,farmer_0003,Banana,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00750,farmer_0029,Chilli,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00751,farmer_0027,Cauliflower,Decent quality. Will order again if price drops.,3,neutral
+review_00752,farmer_0048,Brinjal,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00753,farmer_0015,Brinjal,Fresh and clean vegetables. Packaging was great. Price was fair.,4,positive
+review_00754,farmer_0026,Rice,Good value for money. Will definitely reorder. Recommended!,4,positive
+review_00755,farmer_0023,Cauliflower,"Good produce, slightly overpriced but worth it.",4,positive
+review_00756,farmer_0031,Groundnut,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00757,farmer_0033,Banana,Excellent quality tomatoes! Very fresh and delivered on time. Not ordering again.,5,positive
+review_00758,farmer_0008,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00759,farmer_0024,Brinjal,Good value for money. Will definitely reorder. Recommended!,4,positive
+review_00760,farmer_0046,Banana,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00761,farmer_0005,Onion,Fresh and clean vegetables. Packaging was great. Price was fair.,4,positive
+review_00762,farmer_0008,Onion,Very fresh and organic. Highly recommended.,5,positive
+review_00763,farmer_0002,Cabbage,Outstanding! Best rice I have ever bought online.,5,positive
+review_00764,farmer_0005,Onion,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00765,farmer_0026,Sugarcane,Decent quality. Will order again if price drops.,3,neutral
+review_00766,farmer_0022,Chilli,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00767,farmer_0025,Chilli,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00768,farmer_0033,Rice,Love the eco-friendly packaging. Vegetables are fresh. Price was fair.,5,positive
+review_00769,farmer_0017,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00770,farmer_0015,Brinjal,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00771,farmer_0002,Rice,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00772,farmer_0044,Banana,Outstanding! Best rice I have ever bought online.,5,positive
+review_00773,farmer_0018,Chilli,Not satisfied. Price changed after ordering.,2,negative
+review_00774,farmer_0044,Groundnut,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00775,farmer_0001,Rice,Good value for money. Will definitely reorder.,4,positive
+review_00776,farmer_0006,Carrot,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00777,farmer_0009,Potato,Very fresh and organic. Highly recommended.,5,positive
+review_00778,farmer_0015,Lady Finger,Quantity was less than ordered. Disappointed.,2,negative
+review_00779,farmer_0031,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00780,farmer_0045,Onion,Outstanding! Best rice I have ever bought online.,5,positive
+review_00781,farmer_0050,Brinjal,Not satisfied. Price changed after ordering.,2,negative
+review_00782,farmer_0014,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00783,farmer_0035,Chilli,Good value for money. Will definitely reorder.,4,positive
+review_00784,farmer_0004,Carrot,Not satisfied. Price changed after ordering.,2,negative
+review_00785,farmer_0041,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00786,farmer_0038,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00787,farmer_0037,Onion,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00788,farmer_0024,Tomato,Very fresh and organic. Highly recommended.,5,positive
+review_00789,farmer_0027,Cotton,Decent quality. Will order again if price drops. Will buy again.,3,neutral
+review_00790,farmer_0049,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00791,farmer_0041,Banana,Excellent quality tomatoes! Very fresh and delivered on time. Delivery took too long.,5,positive
+review_00792,farmer_0030,Tomato,Decent quality. Will order again if price drops. Price was fair.,3,neutral
+review_00793,farmer_0012,Cotton,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00794,farmer_0022,Sugarcane,Quantity was less than ordered. Disappointed.,2,negative
+review_00795,farmer_0046,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00796,farmer_0039,Chilli,Outstanding! Best rice I have ever bought online.,5,positive
+review_00797,farmer_0028,Carrot,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00798,farmer_0048,Cotton,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00799,farmer_0045,Sugarcane,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00800,farmer_0009,Brinjal,Delivery was late but produce quality was good.,3,neutral
+review_00801,farmer_0001,Onion,Delivery was late but produce quality was good. Recommended!,3,neutral
+review_00802,farmer_0048,Cauliflower,Very fresh and organic. Highly recommended.,5,positive
+review_00803,farmer_0005,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00804,farmer_0030,Carrot,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00805,farmer_0045,Cotton,Not satisfied. Price changed after ordering.,2,negative
+review_00806,farmer_0015,Chilli,Delivery was late but produce quality was good.,3,neutral
+review_00807,farmer_0046,Rice,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00808,farmer_0028,Banana,Decent quality. Will order again if price drops. Will buy again.,3,neutral
+review_00809,farmer_0039,Brinjal,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00810,farmer_0004,Onion,Fresh and clean vegetables. Packaging was great. Recommended!,4,positive
+review_00811,farmer_0007,Potato,Quantity was less than ordered. Disappointed. Delivery took too long.,2,negative
+review_00812,farmer_0019,Coconut,Not satisfied. Price changed after ordering.,2,negative
+review_00813,farmer_0026,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00814,farmer_0003,Cabbage,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00815,farmer_0050,Carrot,Outstanding! Best rice I have ever bought online.,5,positive
+review_00816,farmer_0006,Sugarcane,Outstanding! Best rice I have ever bought online.,5,positive
+review_00817,farmer_0012,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00818,farmer_0016,Chilli,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00819,farmer_0010,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00820,farmer_0035,Rice,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00821,farmer_0044,Lady Finger,Not satisfied. Price changed after ordering. Will buy again.,2,negative
+review_00822,farmer_0023,Cabbage,Good value for money. Will definitely reorder.,4,positive
+review_00823,farmer_0037,Lady Finger,Very fresh and organic. Highly recommended.,5,positive
+review_00824,farmer_0004,Cauliflower,"Good produce, slightly overpriced but worth it.",4,positive
+review_00825,farmer_0021,Groundnut,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00826,farmer_0046,Brinjal,Outstanding! Best rice I have ever bought online.,5,positive
+review_00827,farmer_0022,Lady Finger,"Good produce, slightly overpriced but worth it.",4,positive
+review_00828,farmer_0034,Cabbage,Decent quality. Will order again if price drops. Recommended!,3,neutral
+review_00829,farmer_0044,Cauliflower,Quantity was less than ordered. Disappointed.,2,negative
+review_00830,farmer_0018,Onion,Decent quality. Will order again if price drops.,3,neutral
+review_00831,farmer_0001,Brinjal,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00832,farmer_0008,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00833,farmer_0017,Banana,"Good produce, slightly overpriced but worth it. Price was fair.",4,positive
+review_00834,farmer_0006,Onion,Very fresh and organic. Highly recommended.,5,positive
+review_00835,farmer_0016,Tomato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00836,farmer_0024,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00837,farmer_0032,Rice,Outstanding! Best rice I have ever bought online. Not ordering again.,5,positive
+review_00838,farmer_0043,Lady Finger,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00839,farmer_0042,Cotton,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00840,farmer_0012,Rice,Delivery was late but produce quality was good.,3,neutral
+review_00841,farmer_0043,Brinjal,Quantity was less than ordered. Disappointed.,2,negative
+review_00842,farmer_0047,Brinjal,Outstanding! Best rice I have ever bought online.,5,positive
+review_00843,farmer_0036,Lady Finger,Quantity was less than ordered. Disappointed. Price was fair.,2,negative
+review_00844,farmer_0022,Rice,Love the eco-friendly packaging. Vegetables are fresh. Will buy again.,5,positive
+review_00845,farmer_0007,Potato,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00846,farmer_0047,Cotton,"Good produce, slightly overpriced but worth it.",4,positive
+review_00847,farmer_0036,Potato,Decent quality. Will order again if price drops.,3,neutral
+review_00848,farmer_0037,Carrot,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00849,farmer_0043,Groundnut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00850,farmer_0010,Lady Finger,Very fresh and organic. Highly recommended.,5,positive
+review_00851,farmer_0047,Cabbage,Very fresh and organic. Highly recommended.,5,positive
+review_00852,farmer_0014,Cabbage,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00853,farmer_0024,Brinjal,Amazing farmer! Always delivers premium quality.,5,positive
+review_00854,farmer_0026,Cotton,"Good produce, slightly overpriced but worth it.",4,positive
+review_00855,farmer_0009,Onion,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00856,farmer_0001,Rice,Good value for money. Will definitely reorder.,4,positive
+review_00857,farmer_0031,Tomato,Not satisfied. Price changed after ordering.,2,negative
+review_00858,farmer_0038,Cabbage,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00859,farmer_0016,Brinjal,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00860,farmer_0034,Coconut,Decent quality. Will order again if price drops.,3,neutral
+review_00861,farmer_0027,Cauliflower,Decent quality. Will order again if price drops.,3,neutral
+review_00862,farmer_0028,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00863,farmer_0015,Potato,Good value for money. Will definitely reorder.,4,positive
+review_00864,farmer_0049,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00865,farmer_0033,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00866,farmer_0039,Potato,Outstanding! Best rice I have ever bought online.,5,positive
+review_00867,farmer_0028,Brinjal,Not satisfied. Price changed after ordering.,2,negative
+review_00868,farmer_0029,Cabbage,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00869,farmer_0012,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00870,farmer_0031,Cotton,Very fresh and organic. Highly recommended.,5,positive
+review_00871,farmer_0018,Cotton,Outstanding! Best rice I have ever bought online.,5,positive
+review_00872,farmer_0029,Potato,Delivery was late but produce quality was good.,3,neutral
+review_00873,farmer_0024,Coconut,Very fresh and organic. Highly recommended.,5,positive
+review_00874,farmer_0033,Potato,Outstanding! Best rice I have ever bought online. Delivery took too long.,5,positive
+review_00875,farmer_0018,Brinjal,Decent quality. Will order again if price drops. Delivery took too long.,3,neutral
+review_00876,farmer_0001,Cabbage,Quantity was less than ordered. Disappointed.,2,negative
+review_00877,farmer_0013,Banana,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00878,farmer_0049,Potato,Delivery was late but produce quality was good.,3,neutral
+review_00879,farmer_0026,Carrot,Excellent quality tomatoes! Very fresh and delivered on time. Will buy again.,5,positive
+review_00880,farmer_0048,Groundnut,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00881,farmer_0017,Chilli,Not satisfied. Price changed after ordering.,2,negative
+review_00882,farmer_0024,Brinjal,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00883,farmer_0046,Cotton,Terrible experience. Vegetables were rotten on arrival. Delivery took too long.,1,negative
+review_00884,farmer_0030,Cotton,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00885,farmer_0050,Cotton,Good value for money. Will definitely reorder.,4,positive
+review_00886,farmer_0015,Chilli,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00887,farmer_0022,Potato,"Good produce, slightly overpriced but worth it.",4,positive
+review_00888,farmer_0026,Sugarcane,Not satisfied. Price changed after ordering. Price was fair.,2,negative
+review_00889,farmer_0009,Chilli,Quantity was less than ordered. Disappointed.,2,negative
+review_00890,farmer_0031,Cotton,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00891,farmer_0002,Tomato,Not satisfied. Price changed after ordering.,2,negative
+review_00892,farmer_0014,Groundnut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00893,farmer_0027,Carrot,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00894,farmer_0032,Groundnut,Love the eco-friendly packaging. Vegetables are fresh. Will buy again.,5,positive
+review_00895,farmer_0009,Potato,Terrible experience. Vegetables were rotten on arrival. Not ordering again.,1,negative
+review_00896,farmer_0045,Groundnut,Decent quality. Will order again if price drops.,3,neutral
+review_00897,farmer_0050,Lady Finger,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00898,farmer_0015,Brinjal,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00899,farmer_0049,Carrot,Not satisfied. Price changed after ordering. Not ordering again.,2,negative
+review_00900,farmer_0015,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00901,farmer_0047,Sugarcane,Quantity was less than ordered. Disappointed.,2,negative
+review_00902,farmer_0001,Lady Finger,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00903,farmer_0010,Coconut,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00904,farmer_0014,Sugarcane,Terrible experience. Vegetables were rotten on arrival. Recommended!,1,negative
+review_00905,farmer_0013,Rice,Quantity was less than ordered. Disappointed. Will buy again.,2,negative
+review_00906,farmer_0044,Onion,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00907,farmer_0033,Rice,Not satisfied. Price changed after ordering.,2,negative
+review_00908,farmer_0041,Cotton,Decent quality. Will order again if price drops. Price was fair.,3,neutral
+review_00909,farmer_0036,Coconut,"Good produce, slightly overpriced but worth it. Price was fair.",4,positive
+review_00910,farmer_0015,Brinjal,Love the eco-friendly packaging. Vegetables are fresh. Price was fair.,5,positive
+review_00911,farmer_0046,Coconut,"Good produce, slightly overpriced but worth it.",4,positive
+review_00912,farmer_0044,Coconut,Not satisfied. Price changed after ordering.,2,negative
+review_00913,farmer_0027,Carrot,"Good produce, slightly overpriced but worth it.",4,positive
+review_00914,farmer_0002,Cauliflower,Not satisfied. Price changed after ordering.,2,negative
+review_00915,farmer_0019,Chilli,Not satisfied. Price changed after ordering.,2,negative
+review_00916,farmer_0020,Banana,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00917,farmer_0010,Onion,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00918,farmer_0045,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00919,farmer_0043,Potato,Good value for money. Will definitely reorder. Delivery took too long.,4,positive
+review_00920,farmer_0014,Sugarcane,Very fresh and organic. Highly recommended. Not ordering again.,5,positive
+review_00921,farmer_0029,Rice,Average quality. Onions had some bad ones mixed in.,3,neutral
+review_00922,farmer_0039,Groundnut,Not satisfied. Price changed after ordering.,2,negative
+review_00923,farmer_0040,Rice,Decent quality. Will order again if price drops.,3,neutral
+review_00924,farmer_0009,Lady Finger,Outstanding! Best rice I have ever bought online.,5,positive
+review_00925,farmer_0003,Rice,Decent quality. Will order again if price drops. Delivery took too long.,3,neutral
+review_00926,farmer_0039,Brinjal,Amazing farmer! Always delivers premium quality.,5,positive
+review_00927,farmer_0044,Lady Finger,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00928,farmer_0006,Sugarcane,"Quality inconsistent. Sometimes good, sometimes bad. Will buy again.",3,neutral
+review_00929,farmer_0007,Carrot,Delivery was late but produce quality was good. Will buy again.,3,neutral
+review_00930,farmer_0038,Cabbage,Decent quality. Will order again if price drops.,3,neutral
+review_00931,farmer_0023,Cotton,Not satisfied. Price changed after ordering.,2,negative
+review_00932,farmer_0044,Coconut,Delivery was late but produce quality was good.,3,neutral
+review_00933,farmer_0001,Groundnut,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00934,farmer_0048,Coconut,Very fresh and organic. Highly recommended.,5,positive
+review_00935,farmer_0043,Cotton,Decent quality. Will order again if price drops.,3,neutral
+review_00936,farmer_0030,Rice,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00937,farmer_0031,Onion,Outstanding! Best rice I have ever bought online.,5,positive
+review_00938,farmer_0037,Coconut,"Quality inconsistent. Sometimes good, sometimes bad. Delivery took too long.",3,neutral
+review_00939,farmer_0010,Lady Finger,Decent quality. Will order again if price drops.,3,neutral
+review_00940,farmer_0040,Onion,Amazing farmer! Always delivers premium quality.,5,positive
+review_00941,farmer_0015,Lady Finger,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00942,farmer_0031,Groundnut,Delivery was late but produce quality was good. Will buy again.,3,neutral
+review_00943,farmer_0023,Carrot,Average quality. Onions had some bad ones mixed in. Not ordering again.,3,neutral
+review_00944,farmer_0044,Brinjal,Good value for money. Will definitely reorder.,4,positive
+review_00945,farmer_0015,Carrot,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00946,farmer_0039,Banana,Amazing farmer! Always delivers premium quality. Not ordering again.,5,positive
+review_00947,farmer_0023,Chilli,Excellent quality tomatoes! Very fresh and delivered on time. Delivery took too long.,5,positive
+review_00948,farmer_0027,Chilli,Good value for money. Will definitely reorder.,4,positive
+review_00949,farmer_0042,Chilli,Very fresh and organic. Highly recommended.,5,positive
+review_00950,farmer_0033,Brinjal,Terrible experience. Vegetables were rotten on arrival. Recommended!,1,negative
+review_00951,farmer_0048,Cabbage,Terrible experience. Vegetables were rotten on arrival. Will buy again.,1,negative
+review_00952,farmer_0048,Cotton,"Good produce, slightly overpriced but worth it. Will buy again.",4,positive
+review_00953,farmer_0025,Coconut,Quantity was less than ordered. Disappointed.,2,negative
+review_00954,farmer_0023,Sugarcane,Very fresh and organic. Highly recommended. Will buy again.,5,positive
+review_00955,farmer_0030,Rice,Very fresh and organic. Highly recommended.,5,positive
+review_00956,farmer_0012,Potato,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00957,farmer_0029,Banana,Fresh and clean vegetables. Packaging was great. Delivery took too long.,4,positive
+review_00958,farmer_0028,Coconut,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00959,farmer_0038,Onion,Very fresh and organic. Highly recommended. Recommended!,5,positive
+review_00960,farmer_0020,Lady Finger,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00961,farmer_0047,Sugarcane,Decent quality. Will order again if price drops.,3,neutral
+review_00962,farmer_0014,Cabbage,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00963,farmer_0020,Cauliflower,Fresh and clean vegetables. Packaging was great. Not ordering again.,4,positive
+review_00964,farmer_0050,Lady Finger,Good value for money. Will definitely reorder.,4,positive
+review_00965,farmer_0045,Rice,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00966,farmer_0023,Carrot,Not satisfied. Price changed after ordering.,2,negative
+review_00967,farmer_0018,Onion,Delivery was late but produce quality was good.,3,neutral
+review_00968,farmer_0004,Cotton,Quantity was less than ordered. Disappointed.,2,negative
+review_00969,farmer_0002,Carrot,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00970,farmer_0027,Banana,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00971,farmer_0046,Coconut,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00972,farmer_0036,Onion,Not satisfied. Price changed after ordering.,2,negative
+review_00973,farmer_0016,Sugarcane,Excellent quality tomatoes! Very fresh and delivered on time. Price was fair.,5,positive
+review_00974,farmer_0037,Cabbage,Outstanding! Best rice I have ever bought online.,5,positive
+review_00975,farmer_0014,Sugarcane,Outstanding! Best rice I have ever bought online. Price was fair.,5,positive
+review_00976,farmer_0050,Lady Finger,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00977,farmer_0009,Lady Finger,Love the eco-friendly packaging. Vegetables are fresh. Not ordering again.,5,positive
+review_00978,farmer_0025,Groundnut,Amazing farmer! Always delivers premium quality. Not ordering again.,5,positive
+review_00979,farmer_0006,Lady Finger,Delivery was late but produce quality was good.,3,neutral
+review_00980,farmer_0020,Sugarcane,Terrible experience. Vegetables were rotten on arrival.,1,negative
+review_00981,farmer_0038,Lady Finger,Quantity was less than ordered. Disappointed.,2,negative
+review_00982,farmer_0033,Rice,Love the eco-friendly packaging. Vegetables are fresh.,5,positive
+review_00983,farmer_0023,Tomato,Quantity was less than ordered. Disappointed. Not ordering again.,2,negative
+review_00984,farmer_0033,Chilli,Amazing farmer! Always delivers premium quality.,5,positive
+review_00985,farmer_0026,Potato,Amazing farmer! Always delivers premium quality. Recommended!,5,positive
+review_00986,farmer_0010,Rice,Fresh and clean vegetables. Packaging was great.,4,positive
+review_00987,farmer_0037,Coconut,Excellent quality tomatoes! Very fresh and delivered on time.,5,positive
+review_00988,farmer_0025,Banana,Amazing farmer! Always delivers premium quality.,5,positive
+review_00989,farmer_0041,Potato,Very fresh and organic. Highly recommended.,5,positive
+review_00990,farmer_0020,Cotton,Outstanding! Best rice I have ever bought online.,5,positive
+review_00991,farmer_0034,Groundnut,"Quality inconsistent. Sometimes good, sometimes bad. Not ordering again.",3,neutral
+review_00992,farmer_0008,Potato,Amazing farmer! Always delivers premium quality.,5,positive
+review_00993,farmer_0025,Tomato,"Quality inconsistent. Sometimes good, sometimes bad. Not ordering again.",3,neutral
+review_00994,farmer_0005,Tomato,"Quality inconsistent. Sometimes good, sometimes bad. Price was fair.",3,neutral
+review_00995,farmer_0014,Chilli,Decent quality. Will order again if price drops.,3,neutral
+review_00996,farmer_0040,Banana,"Quality inconsistent. Sometimes good, sometimes bad.",3,neutral
+review_00997,farmer_0020,Carrot,Very fresh and organic. Highly recommended.,5,positive
+review_00998,farmer_0026,Banana,Good value for money. Will definitely reorder. Price was fair.,4,positive
+review_00999,farmer_0048,Cauliflower,Quantity was less than ordered. Disappointed. Price was fair.,2,negative

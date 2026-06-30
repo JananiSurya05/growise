@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/app/lib/supabase-server";
 import { rateLimit, getClientIp } from "@/app/lib/rateLimit";
+import { isAllowedOrigin } from "@/app/lib/csrf";
 import { logger } from "@/app/lib/logger";
 
 const ML_API = process.env.ML_API_URL ?? "http://localhost:8001";
@@ -216,11 +217,17 @@ async function generateLlmSummary(insights: Insight[], farmerName: string): Prom
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+
+  if (!isAllowedOrigin(req)) {
+    logger.security("csrf:violation", { ip, endpoint: "insights", origin: req.headers.get("origin") });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const supabase = createServerClient(req);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const ip = getClientIp(req);
   if (!rateLimit(`insights:${ip}`, 10, 60_000).allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }

@@ -1,0 +1,15 @@
+{
+  "phase": "ML-4",
+  "task": "Crop Recommendation Engine",
+  "approach": "Rule-Based + Content-Based + ML Ranking (GBR)",
+  "training_samples": 360,
+  "ranking_mae": 0.000184,
+  "features": [
+    "crop_encoded",
+    "location_encoded",
+    "season_encoded",
+    "profitability_score",
+    "demand_score",
+    "risk_score"
+  ]
+}

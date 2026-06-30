@@ -1,71 +1,73 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import type { AppUser } from "../lib/types";
+import PersonalizedFeed from "../components/PersonalizedFeed";
+import ConsumerSidebar from "../components/ConsumerSidebar";
+import AppLoadingState from "../components/ui/AppLoadingState";
+import AppEmptyState from "../components/ui/AppEmptyState";
+
+type RecentOrder = { id: string; status: string; total: number; quantity: number; crop_id: string; crop_name?: string; product_name?: string };
+type StatsOrder = { total: number; amount_saved: number; farmer_id: string };
 
 export default function ConsumerDashboard() {
-    const [user, setUser] = useState<any>(null);
-    const [orders, setOrders] = useState<any[]>([]);
+    const router = useRouter();
+    const [user, setUser] = useState<AppUser | null>(null);
+    const [orders, setOrders] = useState<RecentOrder[]>([]);
     const [stats, setStats] = useState({ totalOrders: 0, totalSaved: 0, totalFarmers: 0 });
     const [loading, setLoading] = useState(true);
+    const [consumerId, setConsumerId] = useState("");
 
     useEffect(() => {
         async function loadData() {
-            // Get logged in user
             const { data: { user: authUser } } = await supabase.auth.getUser();
             if (!authUser) {
-                window.location.href = "/login";
+                router.replace("/login");
                 return;
             }
 
-            // Get user profile from users table
             const { data: profile } = await supabase
                 .from("users")
-                .select("*")
+                .select("id, name, email, location, role")
                 .eq("id", authUser.id)
                 .single();
 
-            setUser(profile || {
-                name: authUser.user_metadata?.full_name || authUser.email,
-                email: authUser.email,
-                location: "Tamil Nadu"
+            setConsumerId(authUser.id);
+            setUser((profile as AppUser | null) ?? {
+                id: authUser.id,
+                role: "consumer",
+                name: authUser.user_metadata?.full_name ?? authUser.email ?? "User",
+                email: authUser.email ?? "",
+                location: "Tamil Nadu",
             });
 
-            // Get recent orders
             const { data: orderData } = await supabase
                 .from("orders")
-                .select("*")
+                .select("id, status, total, quantity, crop_id")
                 .eq("consumer_id", authUser.id)
                 .order("created_at", { ascending: false })
                 .limit(3);
 
-            setOrders(orderData || []);
+            setOrders((orderData as RecentOrder[] | null) ?? []);
 
-            // Get stats
             const { data: allOrders } = await supabase
                 .from("orders")
-                .select("*")
+                .select("total, amount_saved, farmer_id")
                 .eq("consumer_id", authUser.id);
 
             if (allOrders) {
-                const totalSaved = allOrders.reduce((sum: number, o: any) => sum + (o.amount_saved || 0), 0);
-                const farmerIds = new Set(allOrders.map((o: any) => o.farmer_id));
-                setStats({
-                    totalOrders: allOrders.length,
-                    totalSaved,
-                    totalFarmers: farmerIds.size,
-                });
+                const typed = allOrders as StatsOrder[];
+                const totalSaved = typed.reduce((sum, o) => sum + (o.amount_saved ?? 0), 0);
+                const farmerIds = new Set(typed.map((o) => o.farmer_id));
+                setStats({ totalOrders: typed.length, totalSaved, totalFarmers: farmerIds.size });
             }
 
             setLoading(false);
         }
 
         loadData();
-    }, []);
-
-    async function handleLogout() {
-        await supabase.auth.signOut();
-        window.location.href = "/login";
-    }
+    }, [router]);
 
     const firstName = user?.name?.split(" ")[0] || "there";
     const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -83,83 +85,11 @@ export default function ConsumerDashboard() {
             background: "#014D4E",
             fontFamily: "'Segoe UI', sans-serif",
             display: "flex",
-            padding: "20px",
-            gap: "16px",
         }}>
-
-            {/* Sidebar */}
-            <div style={{
-                width: "200px", flexShrink: 0,
-                background: "rgba(0,0,0,0.25)",
-                borderRadius: "16px", padding: "20px",
-                display: "flex", flexDirection: "column",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.06)"
-            }}>
-                {/* Logo */}
-                <div style={{ marginBottom: "20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                        <span style={{ fontSize: "18px" }}>🌿</span>
-                        <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>
-                            Gro<span style={{ color: "#4ade80" }}>Wise</span>
-                        </span>
-                    </div>
-                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", paddingLeft: "26px" }}>Consumer Portal</div>
-                </div>
-
-                {/* Profile */}
-                <div style={{ marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                    <div style={{
-                        width: "40px", height: "40px", borderRadius: "10px",
-                        background: "rgba(96,165,250,0.2)", border: "2px solid rgba(96,165,250,0.3)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: "18px", marginBottom: "8px"
-                    }}>
-                        {loading ? "..." : (user?.name?.[0]?.toUpperCase() || "U")}
-                    </div>
-                    <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>
-                        {loading ? "Loading..." : (user?.name || user?.email || "User")}
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#60a5fa" }}>● Online · {user?.location || "Tamil Nadu"}</div>
-                </div>
-
-                {/* Nav */}
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "3px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/consumer", active: true },
-                        { icon: "🥦", label: "Shop", href: "/consumer/shop" },
-                        { icon: "📱", label: "Scan QR", href: "/consumer/qr" },
-                        { icon: "🥗", label: "Nutrition", href: "/consumer/nutrition" },
-                        { icon: "📦", label: "My Orders", href: "/consumer/orders" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{
-                                display: "flex", alignItems: "center", gap: "10px",
-                                padding: "9px 10px", borderRadius: "9px",
-                                background: item.active ? "rgba(96,165,250,0.15)" : "transparent",
-                                border: item.active ? "1px solid rgba(96,165,250,0.25)" : "1px solid transparent",
-                            }}>
-                                <span style={{ fontSize: "15px" }}>{item.icon}</span>
-                                <span style={{
-                                    fontSize: "13px",
-                                    fontWeight: item.active ? "600" : "400",
-                                    color: item.active ? "#60a5fa" : "rgba(255,255,255,0.45)"
-                                }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-
-                <div onClick={handleLogout} style={{ textDecoration: "none", cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 10px", borderRadius: "9px", marginTop: "8px" }}>
-                        <span style={{ fontSize: "15px" }}>🚪</span>
-                        <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
+            <ConsumerSidebar activeHref="/consumer" firstName={loading ? "Consumer" : (user?.name?.split(" ")[0] || user?.email || "Consumer")} />
 
             {/* Main */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div style={{ marginLeft: "200px", flex: 1, display: "flex", flexDirection: "column", gap: "14px", padding: "20px" }}>
 
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -176,6 +106,11 @@ export default function ConsumerDashboard() {
                         fontSize: "12px", color: "#60a5fa", fontWeight: "600"
                     }}>🛒 {stats.totalOrders} total orders</div>
                 </div>
+
+                {/* Personalized Feed */}
+                {consumerId && (
+                    <PersonalizedFeed consumerId={consumerId} location={user?.location} />
+                )}
 
                 {/* Bento grid */}
                 <div style={{
@@ -310,13 +245,10 @@ export default function ConsumerDashboard() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             {loading ? (
-                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Loading orders...</div>
+                                <AppLoadingState fullScreen={false} label="Loading orders..." />
                             ) : orders.length === 0 ? (
-                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "center", padding: "10px 0" }}>
-                                    No orders yet.<br />
-                                    <span style={{ color: "#4ade80" }}>Start shopping! →</span>
-                                </div>
-                            ) : orders.map((o: any, i: number) => {
+                                <AppEmptyState icon="📦" title="No orders yet" description="Start shopping!" />
+                            ) : orders.map((o, i) => {
                                 const status = (o.status || "processing").toLowerCase();
                                 const color = statusColor[status] || "#60a5fa";
                                 return (

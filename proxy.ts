@@ -15,14 +15,14 @@ function buildCsp(nonce: string) {
   return [
     "default-src 'self'",
     // unsafe-eval required by React/Turbopack in development for error stack reconstruction
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://checkout.razorpay.com${isDev ? " 'unsafe-eval'" : ""}`,
     // style-src stays unsafe-inline: the app renders via inline style={} props app-wide;
     // tightening this requires migrating to the Tailwind token system first.
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://api.openweathermap.org",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://api.openweathermap.org https://*.razorpay.com wss://*.razorpay.com",
     "font-src 'self'",
-    "frame-src 'none'",
+    "frame-src https://api.razorpay.com https://*.razorpay.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self' https://accounts.google.com",

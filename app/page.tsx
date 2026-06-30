@@ -80,7 +80,7 @@ export default function Home() {
           marginBottom: "28px", letterSpacing: "0.06em"
         }}>
           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-          INDIA'S AI-POWERED AGRIFOOD PLATFORM
+          INDIA&apos;S AI-POWERED AGRIFOOD PLATFORM
         </div>
 
         {/* Title */}

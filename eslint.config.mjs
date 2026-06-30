@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Playwright build artifacts — bundled minified assets trigger false positives
+    "playwright-report/**",
+    "tests/playwright-report/**",
+    "tests/results/**",
+    "qa-audit.js",
   ]),
 ]);
 

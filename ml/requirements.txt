@@ -1,0 +1,38 @@
+# GroWise ML Service — Python Dependencies
+# Install: pip install -r ml/requirements.txt
+
+# Core ML
+numpy>=2.0.0
+pandas>=2.0.0
+scikit-learn>=1.5.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# NLP
+vaderSentiment>=3.3.2
+
+# API Service
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+
+# Experiment Tracking
+mlflow>=3.0.0
+
+# Visualization (for notebooks)
+matplotlib>=3.8.0
+
+# Optional — Deep Learning (LSTM, Autoencoder, CNN)
+# pip install torch torchvision  (CPU: ~1GB, GPU: ~2GB)
+
+# Optional — Disease Detection ONNX Inference
+# pip install onnxruntime pillow
+
+# Optional — DistilBERT Sentiment
+# pip install transformers sentencepiece
+
+# Optional — Dataset download
+# pip install kaggle
+
+# Optional — DVC (data versioning)
+# pip install dvc

@@ -1,27 +1,25 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState } from "react";
 import { useAuth } from "../../lib/useAuth";
-import { supabase } from "../../lib/supabase";
+import FarmerLayout from "../../components/FarmerLayout";
+import AppInput from "../../components/ui/AppInput";
 
 export default function WeatherPage() {
-    const { loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [city, setCity] = useState("");
-    const [weather, setWeather] = useState<any>(null);
+    const [weather, setWeather] = useState<import("../../lib/types").WeatherData | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     async function getWeather() {
         if (!city.trim()) return;
         setLoading(true);
         setError("");
         setWeather(null);
-        const res = await fetch(`/api/weather?city=${city}`);
+        const res = await fetch(`/api/weather?${new URLSearchParams({ city })}`);
         const data = await res.json();
         if (data.error) setError("City not found. Try again.");
         else setWeather(data);
@@ -50,40 +48,7 @@ export default function WeatherPage() {
     }
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather", active: true },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(96,165,250,0.12)" : "transparent", border: item.active ? "1px solid rgba(96,165,250,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <FarmerLayout activeHref="/farmer/weather" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
@@ -98,7 +63,7 @@ export default function WeatherPage() {
                                 <button key={c} onClick={() => setCity(c)} style={{ background: city === c ? "rgba(96,165,250,0.2)" : "rgba(255,255,255,0.05)", border: city === c ? "1px solid rgba(96,165,250,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: "999px", padding: "4px 12px", fontSize: "11px", color: city === c ? "#60a5fa" : "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Segoe UI', sans-serif" }}>{c}</button>
                             ))}
                         </div>
-                        <input value={city} onChange={e => setCity(e.target.value)} onKeyDown={e => e.key === "Enter" && getWeather()} placeholder="Enter city..." style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "9px 14px", fontSize: "13px", color: "white", outline: "none", fontFamily: "'Segoe UI', sans-serif", width: "160px" }} />
+                        <AppInput aria-label="City" value={city} onChange={e => setCity(e.target.value)} onKeyDown={e => e.key === "Enter" && getWeather()} placeholder="Enter city..." style={{ background: "#012e2f", padding: "9px 14px", width: "160px" }} />
                         <button onClick={getWeather} style={{ background: "#4ade80", color: "#0a0a0a", border: "none", borderRadius: "10px", padding: "9px 18px", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}>{loading ? "..." : "Search"}</button>
                     </div>
                 </div>
@@ -243,7 +208,6 @@ export default function WeatherPage() {
                         </div>
                     );
                 })()}
-            </div>
-        </main>
+        </FarmerLayout>
     );
 }

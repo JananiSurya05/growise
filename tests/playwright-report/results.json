@@ -1,0 +1,698 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\project\\growise\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/e2e/19-rls-security.spec.ts",
+      "-g",
+      "RLS-4",
+      "--project=chromium-desktop"
+    ],
+    "configFile": "D:\\project\\growise\\playwright.config.ts",
+    "rootDir": "D:/project/growise/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "D:\\project\\growise\\tests\\e2e\\auth-setup\\global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/project/growise/tests/results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-desktop",
+        "name": "chromium-desktop",
+        "testDir": "D:/project/growise/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/project/growise/tests/results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-mobile",
+        "name": "chromium-mobile",
+        "testDir": "D:/project/growise/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "tests/playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tests/playwright-report/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 60000,
+      "stdout": "ignore",
+      "stderr": "ignore"
+    }
+  },
+  "suites": [
+    {
+      "title": "19-rls-security.spec.ts",
+      "file": "19-rls-security.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "RLS-4: Anon key — direct REST access to Supabase",
+          "file": "19-rls-security.spec.ts",
+          "line": 47,
+          "column": 6,
+          "specs": [
+            {
+              "title": "anon key SELECT on users → 0 rows when RLS enforced",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 774,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:32:56.518Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-3f376ab6ffcd3398959f",
+              "file": "19-rls-security.spec.ts",
+              "line": 55,
+              "column": 9
+            },
+            {
+              "title": "anon key SELECT on crops → 0 rows when RLS enforced",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 359,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 11,
+                          "line": 72
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m           \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(rows) \u001b[33m?\u001b[39m rows\u001b[33m.\u001b[39mlength \u001b[33m:\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 71 |\u001b[39m           \u001b[32m`CRITICAL: anon key can read ${table} — RLS not applied`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         )\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m       } \u001b[36melse\u001b[39m {\n \u001b[90m 74 |\u001b[39m         \u001b[90m// 401 / 403 also acceptable (Supabase-level auth block)\u001b[39m\n \u001b[90m 75 |\u001b[39m         expect([\u001b[35m200\u001b[39m\u001b[33m,\u001b[39m \u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 11,
+                            "line": 72
+                          },
+                          "message": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  70 |           Array.isArray(rows) ? rows.length : 0,\n  71 |           `CRITICAL: anon key can read ${table} — RLS not applied`\n> 72 |         ).toBe(0);\n     |           ^\n  73 |       } else {\n  74 |         // 401 / 403 also acceptable (Supabase-level auth block)\n  75 |         expect([200, 401, 403]).toContain(res.status());\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:32:57.403Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-405f1--→-0-rows-when-RLS-enforced-chromium-desktop\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-405f1--→-0-rows-when-RLS-enforced-chromium-desktop\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 11,
+                        "line": 72
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 397,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 11,
+                          "line": 72
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m           \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(rows) \u001b[33m?\u001b[39m rows\u001b[33m.\u001b[39mlength \u001b[33m:\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 71 |\u001b[39m           \u001b[32m`CRITICAL: anon key can read ${table} — RLS not applied`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         )\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m       } \u001b[36melse\u001b[39m {\n \u001b[90m 74 |\u001b[39m         \u001b[90m// 401 / 403 also acceptable (Supabase-level auth block)\u001b[39m\n \u001b[90m 75 |\u001b[39m         expect([\u001b[35m200\u001b[39m\u001b[33m,\u001b[39m \u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 11,
+                            "line": 72
+                          },
+                          "message": "Error: CRITICAL: anon key can read crops — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  70 |           Array.isArray(rows) ? rows.length : 0,\n  71 |           `CRITICAL: anon key can read ${table} — RLS not applied`\n> 72 |         ).toBe(0);\n     |           ^\n  73 |       } else {\n  74 |         // 401 / 403 also acceptable (Supabase-level auth block)\n  75 |         expect([200, 401, 403]).toContain(res.status());\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-20T11:32:59.304Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-405f1--→-0-rows-when-RLS-enforced-chromium-desktop-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-405f1--→-0-rows-when-RLS-enforced-chromium-desktop-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 11,
+                        "line": 72
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-ef7d9fd8def54e3ea8a2",
+              "file": "19-rls-security.spec.ts",
+              "line": 55,
+              "column": 9
+            },
+            {
+              "title": "anon key SELECT on orders → 0 rows when RLS enforced",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 713,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 11,
+                          "line": 72
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m           \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(rows) \u001b[33m?\u001b[39m rows\u001b[33m.\u001b[39mlength \u001b[33m:\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 71 |\u001b[39m           \u001b[32m`CRITICAL: anon key can read ${table} — RLS not applied`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         )\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m       } \u001b[36melse\u001b[39m {\n \u001b[90m 74 |\u001b[39m         \u001b[90m// 401 / 403 also acceptable (Supabase-level auth block)\u001b[39m\n \u001b[90m 75 |\u001b[39m         expect([\u001b[35m200\u001b[39m\u001b[33m,\u001b[39m \u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 11,
+                            "line": 72
+                          },
+                          "message": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  70 |           Array.isArray(rows) ? rows.length : 0,\n  71 |           `CRITICAL: anon key can read ${table} — RLS not applied`\n> 72 |         ).toBe(0);\n     |           ^\n  73 |       } else {\n  74 |         // 401 / 403 also acceptable (Supabase-level auth block)\n  75 |         expect([200, 401, 403]).toContain(res.status());\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:33:01.172Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-0a383--→-0-rows-when-RLS-enforced-chromium-desktop\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-0a383--→-0-rows-when-RLS-enforced-chromium-desktop\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 11,
+                        "line": 72
+                      }
+                    },
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 392,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 11,
+                          "line": 72
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m           \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(rows) \u001b[33m?\u001b[39m rows\u001b[33m.\u001b[39mlength \u001b[33m:\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 71 |\u001b[39m           \u001b[32m`CRITICAL: anon key can read ${table} — RLS not applied`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         )\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m       } \u001b[36melse\u001b[39m {\n \u001b[90m 74 |\u001b[39m         \u001b[90m// 401 / 403 also acceptable (Supabase-level auth block)\u001b[39m\n \u001b[90m 75 |\u001b[39m         expect([\u001b[35m200\u001b[39m\u001b[33m,\u001b[39m \u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 11,
+                            "line": 72
+                          },
+                          "message": "Error: CRITICAL: anon key can read orders — RLS not applied\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  70 |           Array.isArray(rows) ? rows.length : 0,\n  71 |           `CRITICAL: anon key can read ${table} — RLS not applied`\n> 72 |         ).toBe(0);\n     |           ^\n  73 |       } else {\n  74 |         // 401 / 403 also acceptable (Supabase-level auth block)\n  75 |         expect([200, 401, 403]).toContain(res.status());\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:72:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-20T11:33:03.208Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-0a383--→-0-rows-when-RLS-enforced-chromium-desktop-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-0a383--→-0-rows-when-RLS-enforced-chromium-desktop-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 11,
+                        "line": 72
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-18152d17e05dfb08e0d5",
+              "file": "19-rls-security.spec.ts",
+              "line": 55,
+              "column": 9
+            },
+            {
+              "title": "anon key SELECT on order_items → 0 rows when RLS enforced",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 390,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:33:05.042Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-d0325da5d8657e42868b",
+              "file": "19-rls-security.spec.ts",
+              "line": 55,
+              "column": 9
+            },
+            {
+              "title": "anon key INSERT into orders → blocked when RLS enforced",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 319,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:103:7",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 7,
+                          "line": 103
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 101 |\u001b[39m       [\u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m\u001b[33m,\u001b[39m \u001b[35m422\u001b[39m\u001b[33m,\u001b[39m \u001b[35m404\u001b[39m]\u001b[33m,\u001b[39m\n \u001b[90m 102 |\u001b[39m       \u001b[32m`CRITICAL: anon key inserted into orders table with status ${res.status()}`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 103 |\u001b[39m     )\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 104 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 105 |\u001b[39m\n \u001b[90m 106 |\u001b[39m   test(\u001b[32m\"anon key DELETE on crops → blocked when RLS enforced\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ request }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 7,
+                            "line": 103
+                          },
+                          "message": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m\n\n  101 |       [401, 403, 422, 404],\n  102 |       `CRITICAL: anon key inserted into orders table with status ${res.status()}`\n> 103 |     ).toContain(res.status());\n      |       ^\n  104 |   });\n  105 |\n  106 |   test(\"anon key DELETE on crops → blocked when RLS enforced\", async ({ request }) => {\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:103:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:33:05.540Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-51db9-→-blocked-when-RLS-enforced-chromium-desktop\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-51db9-→-blocked-when-RLS-enforced-chromium-desktop\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 7,
+                        "line": 103
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 533,
+                      "error": {
+                        "message": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m",
+                        "stack": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:103:7",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 7,
+                          "line": 103
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 101 |\u001b[39m       [\u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m\u001b[33m,\u001b[39m \u001b[35m422\u001b[39m\u001b[33m,\u001b[39m \u001b[35m404\u001b[39m]\u001b[33m,\u001b[39m\n \u001b[90m 102 |\u001b[39m       \u001b[32m`CRITICAL: anon key inserted into orders table with status ${res.status()}`\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 103 |\u001b[39m     )\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 104 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 105 |\u001b[39m\n \u001b[90m 106 |\u001b[39m   test(\u001b[32m\"anon key DELETE on crops → blocked when RLS enforced\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ request }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 7,
+                            "line": 103
+                          },
+                          "message": "Error: CRITICAL: anon key inserted into orders table with status 409\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m409\u001b[39m\nReceived array: \u001b[31m[401, 403, 422, 404]\u001b[39m\n\n  101 |       [401, 403, 422, 404],\n  102 |       `CRITICAL: anon key inserted into orders table with status ${res.status()}`\n> 103 |     ).toContain(res.status());\n      |       ^\n  104 |   });\n  105 |\n  106 |   test(\"anon key DELETE on crops → blocked when RLS enforced\", async ({ request }) => {\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:103:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-20T11:33:07.491Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-51db9-→-blocked-when-RLS-enforced-chromium-desktop-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-51db9-→-blocked-when-RLS-enforced-chromium-desktop-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 7,
+                        "line": 103
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-2d444e5524e17401f52b",
+              "file": "19-rls-security.spec.ts",
+              "line": 80,
+              "column": 7
+            },
+            {
+              "title": "anon key DELETE on crops → blocked when RLS enforced",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 435,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:118:34",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 34,
+                          "line": 118
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 116 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 117 |\u001b[39m     \u001b[90m// Should be blocked; 404 (not found) also acceptable when FAKE_UUID matches 0 rows\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 118 |\u001b[39m     expect([\u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m\u001b[33m,\u001b[39m \u001b[35m404\u001b[39m\u001b[33m,\u001b[39m \u001b[35m200\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 119 |\u001b[39m     \u001b[90m// If 200, verify nothing was deleted (0 rows affected)\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mif\u001b[39m (res\u001b[33m.\u001b[39mstatus() \u001b[33m===\u001b[39m \u001b[35m200\u001b[39m) {\n \u001b[90m 121 |\u001b[39m       \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m res\u001b[33m.\u001b[39mtext()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 34,
+                            "line": 118
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m\n\n  116 |     );\n  117 |     // Should be blocked; 404 (not found) also acceptable when FAKE_UUID matches 0 rows\n> 118 |     expect([401, 403, 404, 200]).toContain(res.status());\n      |                                  ^\n  119 |     // If 200, verify nothing was deleted (0 rows affected)\n  120 |     if (res.status() === 200) {\n  121 |       const body = await res.text();\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:118:34"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:33:09.619Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-535fd-→-blocked-when-RLS-enforced-chromium-desktop\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-535fd-→-blocked-when-RLS-enforced-chromium-desktop\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 34,
+                        "line": 118
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 369,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:118:34",
+                        "location": {
+                          "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                          "column": 34,
+                          "line": 118
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 116 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 117 |\u001b[39m     \u001b[90m// Should be blocked; 404 (not found) also acceptable when FAKE_UUID matches 0 rows\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 118 |\u001b[39m     expect([\u001b[35m401\u001b[39m\u001b[33m,\u001b[39m \u001b[35m403\u001b[39m\u001b[33m,\u001b[39m \u001b[35m404\u001b[39m\u001b[33m,\u001b[39m \u001b[35m200\u001b[39m])\u001b[33m.\u001b[39mtoContain(res\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 119 |\u001b[39m     \u001b[90m// If 200, verify nothing was deleted (0 rows affected)\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mif\u001b[39m (res\u001b[33m.\u001b[39mstatus() \u001b[33m===\u001b[39m \u001b[35m200\u001b[39m) {\n \u001b[90m 121 |\u001b[39m       \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m res\u001b[33m.\u001b[39mtext()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                            "column": 34,
+                            "line": 118
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m204\u001b[39m\nReceived array: \u001b[31m[401, 403, 404, 200]\u001b[39m\n\n  116 |     );\n  117 |     // Should be blocked; 404 (not found) also acceptable when FAKE_UUID matches 0 rows\n> 118 |     expect([401, 403, 404, 200]).toContain(res.status());\n      |                                  ^\n  119 |     // If 200, verify nothing was deleted (0 rows affected)\n  120 |     if (res.status() === 200) {\n  121 |       const body = await res.text();\n    at D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts:118:34"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-20T11:33:11.623Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-535fd-→-blocked-when-RLS-enforced-chromium-desktop-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\project\\growise\\tests\\results\\19-rls-security-RLS-4-Anon-535fd-→-blocked-when-RLS-enforced-chromium-desktop-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\project\\growise\\tests\\e2e\\19-rls-security.spec.ts",
+                        "column": 34,
+                        "line": 118
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-df4c214e6f15ad095cf6",
+              "file": "19-rls-security.spec.ts",
+              "line": 106,
+              "column": 7
+            },
+            {
+              "title": "anon key cannot read users table (profile data)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 401,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-20T11:33:13.976Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e94125c73114f95a56d0-c42e2fd289d2a942e333",
+              "file": "19-rls-security.spec.ts",
+              "line": 127,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-20T11:32:51.350Z",
+    "duration": 23285.396999999997,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  }
+}

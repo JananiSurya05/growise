@@ -1,35 +1,105 @@
 "use client";
-import { useState, useEffect } from "react";
+import AppLoadingState from "../components/ui/AppLoadingState";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabase";
+import { useFarmerOrderStream } from "../lib/useRealtime";
+import { useToast } from "../lib/useToast";
+import AiDecisionPanel from "../components/AiDecisionCard";
+import FarmerLayout from "../components/FarmerLayout";
+import AppCard from "../components/ui/AppCard";
+import AppEmptyState from "../components/ui/AppEmptyState";
+import type { Crop, OrderWithItems } from "../lib/types";
+
+type DashboardCrop = Pick<Crop, "id" | "name" | "price" | "quantity" | "location" | "image_url">;
+type DashboardOrder = Pick<OrderWithItems, "id" | "total" | "quantity" | "amount_saved" | "status" | "created_at"> & {
+    order_items?: Array<{ crop_name: string }>;
+};
+
+type PricePrediction = {
+    crop: string;
+    predicted_price: number;
+    confidence_score: number;
+    weeks_ahead: number;
+    model: string;
+};
+
+type CropRecommendation = {
+    crop: string;
+    composite_score: number;
+    demand_score: number;
+    profitability_score: number;
+    risk_score: number;
+    grow_days: number;
+    reason: string;
+};
 
 export default function FarmerDashboard() {
     const { user, loading: authLoading } = useAuth();
-    const [crops, setCrops] = useState<any[]>([]);
-    const [orders, setOrders] = useState<any[]>([]);
+    const { toast } = useToast();
+    const [crops, setCrops] = useState<DashboardCrop[]>([]);
+    const [orders, setOrders] = useState<DashboardOrder[]>([]);
     const [stats, setStats] = useState({ totalCrops: 0, totalOrders: 0, totalRevenue: 0, totalKg: 0 });
     const [loading, setLoading] = useState(true);
+    const [pricePredictions, setPricePredictions] = useState<PricePrediction[]>([]);
+    const [recommendations, setRecommendations] = useState<CropRecommendation[]>([]);
+    const [mlLoading, setMlLoading] = useState(false);
+    const [liveOrderCount, setLiveOrderCount] = useState(0);
 
-    useEffect(() => {
-        if (user) loadData();
-    }, [user]);
+    const loadMlPredictions = useCallback(async (cropsData: DashboardCrop[]) => {
+        setMlLoading(true);
+        try {
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const season = month >= 6 && month <= 10 ? "Kharif" : month >= 11 || month <= 3 ? "Rabi" : "Zaid";
 
-    async function loadData() {
+            const predPromises = cropsData.slice(0, 4).map(crop =>
+                fetch("/api/ml/price-prediction", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        crop_name: crop.name,
+                        location: crop.location || "Chennai",
+                        month,
+                        season,
+                        quantity_kg: crop.quantity || 500,
+                        weeks_ahead: 1,
+                    }),
+                }).then(r => r.ok ? r.json() : null).catch(() => null)
+            );
+
+            const recPromise = fetch("/api/ml/crop-recommendation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ location: cropsData[0]?.location || "Chennai", season, month, top_k: 5 }),
+            }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+            const [predResults, recResult] = await Promise.all([Promise.all(predPromises), recPromise]);
+            setPricePredictions(predResults.filter(Boolean) as PricePrediction[]);
+            setRecommendations(recResult?.recommendations || []);
+        } catch {
+            // ML service not running — silently skip
+        }
+        setMlLoading(false);
+    }, []);
+
+    const loadData = useCallback(async () => {
+        if (!user) return;
         setLoading(true);
 
         const [cropsRes, ordersRes] = await Promise.all([
-            supabase.from("crops").select("*").eq("farmer_id", user.id),
-            supabase.from("orders").select("*, order_items(*)").eq("farmer_id", user.id).order("created_at", { ascending: false }).limit(5),
+            supabase.from("crops").select("id, name, price, quantity, location, image_url").eq("farmer_id", user.id),
+            supabase.from("orders").select("id, total, quantity, amount_saved, status, created_at, order_items(crop_name)").eq("farmer_id", user.id).order("created_at", { ascending: false }).limit(5),
         ]);
 
-        const cropsData = (cropsRes.data || []) as any[];
-        const ordersData = (ordersRes.data || []) as any[];
+        const cropsData = (cropsRes.data || []) as DashboardCrop[];
+        const ordersData = (ordersRes.data || []) as DashboardOrder[];
 
         setCrops(cropsData);
         setOrders(ordersData);
 
-        const totalRevenue = ordersData.reduce((sum: number, o: any) => sum + (o.total || 0), 0);
-        const totalKg = ordersData.reduce((sum: number, o: any) => sum + (o.quantity || 0), 0);
+        const totalRevenue = ordersData.reduce((sum, o) => sum + (o.total || 0), 0);
+        const totalKg = ordersData.reduce((sum, o) => sum + (o.quantity || 0), 0);
 
         setStats({
             totalCrops: cropsData.length,
@@ -39,71 +109,71 @@ export default function FarmerDashboard() {
         });
 
         setLoading(false);
-    }
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+        // Load ML predictions after core data
+        loadMlPredictions(cropsData);
+    }, [user, loadMlPredictions]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (user) loadData();
+    }, [user, loadData]);
+
+    // Supabase Realtime — live order notifications
+    const handleNewOrder = useCallback((order: Record<string, unknown>) => {
+        const total = order.total as number;
+        const qty = order.quantity as number;
+        toast({
+            type: "order",
+            title: "New Order Received!",
+            message: `₹${total} · ${qty}kg — check your sales dashboard`,
+            duration: 8000,
+        });
+        setLiveOrderCount(n => n + 1);
+        // Refresh order list so it appears immediately
+        setOrders(prev => {
+            const newOrder: DashboardOrder = {
+                id: order.id as string,
+                total: total,
+                quantity: qty,
+                amount_saved: order.amount_saved as number ?? 0,
+                status: (order.status as "Processing" | "On the way" | "Delivered") ?? "Processing",
+                created_at: order.created_at as string ?? new Date().toISOString(),
+            };
+            return [newOrder, ...prev.slice(0, 4)];
+        });
+        setStats(prev => ({
+            ...prev,
+            totalOrders: prev.totalOrders + 1,
+            totalRevenue: prev.totalRevenue + (total ?? 0),
+            totalKg: prev.totalKg + (qty ?? 0),
+        }));
+    }, [toast]);
+
+    useFarmerOrderStream(user?.id, handleNewOrder);
+
+    if (authLoading) return <AppLoadingState />;
 
     const firstName = user?.user_metadata?.full_name?.split(" ")[0] || "Farmer";
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            {/* Sidebar */}
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-
-                {/* Profile */}
-                <div style={{ marginBottom: "16px", paddingBottom: "14px", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 8px 14px" }}>
-                    <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "rgba(74,222,128,0.2)", border: "2px solid rgba(74,222,128,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", marginBottom: "6px" }}>
-                        {firstName[0]}
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{firstName}</div>
-                    <div style={{ fontSize: "10px", color: "#4ade80" }}>● Online · Farmer</div>
-                </div>
-
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer", active: true },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(74,222,128,0.12)" : "transparent", border: item.active ? "1px solid rgba(74,222,128,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
+        <FarmerLayout activeHref="/farmer" firstName={firstName}>
 
             {/* Main */}
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
 
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
-                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
-                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", letterSpacing: ".06em" }}>FARMER DASHBOARD · LIVE DATA</span>
+                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80", animation: "pulse 2s infinite" }} />
+                            <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "600", letterSpacing: ".06em" }}>FARMER DASHBOARD · LIVE</span>
+                            {liveOrderCount > 0 && (
+                                <span style={{ background: "#a78bfa", color: "white", fontSize: "9px", fontWeight: "800", borderRadius: "10px", padding: "2px 7px" }}>
+                                    +{liveOrderCount} new
+                                </span>
+                            )}
                         </div>
+                        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
                         <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white" }}>Welcome back, {firstName}! 👋</h1>
                     </div>
                     <a href="/farmer/crops" style={{ textDecoration: "none" }}>
@@ -156,6 +226,90 @@ export default function FarmerDashboard() {
                     </div>
                 </div>
 
+                {/* AI Decision Engine — proactive insights */}
+                {crops.length > 0 && (
+                    <AiDecisionPanel
+                        location={crops[0]?.location ?? "Chennai"}
+                        crops={crops.map(c => ({ name: c.name, price: c.price, quantity: c.quantity }))}
+                    />
+                )}
+
+                {/* ML Intelligence Panel */}
+                {(pricePredictions.length > 0 || recommendations.length > 0) && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "20px" }}>
+
+                        {/* Price Predictions */}
+                        {pricePredictions.length > 0 && (
+                            <AppCard role="farmer" style={{ background: "rgba(0,0,0,0.3)", padding: "18px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                                    <span style={{ fontSize: "16px" }}>🤖</span>
+                                    <div>
+                                        <div style={{ fontSize: "12px", color: "#4ade80", fontWeight: "700", textTransform: "uppercase", letterSpacing: ".06em" }}>ML Price Forecast</div>
+                                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>XGBoost + Random Forest Ensemble</div>
+                                    </div>
+                                    <div style={{ marginLeft: "auto", background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)", borderRadius: "6px", padding: "2px 8px", fontSize: "9px", color: "#4ade80", fontWeight: "700" }}>AI-POWERED</div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                    {pricePredictions.map((p, i) => {
+                                        const confPct = Math.round(p.confidence_score * 100);
+                                        return (
+                                            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", borderRadius: "8px", padding: "8px 12px" }}>
+                                                <div>
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{p.crop}</div>
+                                                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>Next week forecast</div>
+                                                </div>
+                                                <div style={{ textAlign: "right" }}>
+                                                    <div style={{ fontSize: "16px", fontWeight: "800", color: "#4ade80" }}>₹{p.predicted_price.toFixed(1)}/kg</div>
+                                                    <div style={{ fontSize: "9px", color: confPct >= 80 ? "#4ade80" : "#fbbf24" }}>Confidence: {confPct}%</div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </AppCard>
+                        )}
+
+                        {/* Crop Recommendations */}
+                        {recommendations.length > 0 && (
+                            <AppCard accent="rgba(168,139,250,0.2)" style={{ background: "rgba(0,0,0,0.3)", padding: "18px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                                    <span style={{ fontSize: "16px" }}>🎯</span>
+                                    <div>
+                                        <div style={{ fontSize: "12px", color: "#a78bfa", fontWeight: "700", textTransform: "uppercase", letterSpacing: ".06em" }}>Crop Recommendations</div>
+                                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>GradientBoosting Ranking Model</div>
+                                    </div>
+                                    <div style={{ marginLeft: "auto", background: "rgba(168,139,250,0.12)", border: "1px solid rgba(168,139,250,0.3)", borderRadius: "6px", padding: "2px 8px", fontSize: "9px", color: "#a78bfa", fontWeight: "700" }}>ML MODEL</div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                    {recommendations.slice(0, 4).map((rec, i) => (
+                                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", padding: "7px 12px" }}>
+                                            <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: i === 0 ? "#a78bfa" : "rgba(168,139,250,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: "700", color: "white", flexShrink: 0 }}>{i + 1}</div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontSize: "12px", fontWeight: "600", color: "white" }}>{rec.crop}</div>
+                                                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rec.reason}</div>
+                                            </div>
+                                            <div style={{ textAlign: "right", flexShrink: 0 }}>
+                                                <div style={{ fontSize: "11px", fontWeight: "700", color: "#a78bfa" }}>{Math.round(rec.composite_score * 100)}%</div>
+                                                <div style={{ fontSize: "9px", color: rec.risk_score < 0.3 ? "#4ade80" : rec.risk_score < 0.5 ? "#fbbf24" : "#f87171" }}>
+                                                    Risk: {rec.risk_score < 0.3 ? "Low" : rec.risk_score < 0.5 ? "Med" : "High"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </AppCard>
+                        )}
+                    </div>
+                )}
+
+                {/* ML Loading State */}
+                {mlLoading && (
+                    <div style={{ background: "rgba(0,0,0,0.2)", border: "1px solid rgba(74,222,128,0.1)", borderRadius: "12px", padding: "12px 18px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "14px" }}>🤖</span>
+                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>Loading ML predictions — XGBoost price forecast, GBR recommendations...</span>
+                    </div>
+                )}
+
                 <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "20px" }}>
 
                     {/* My Crops */}
@@ -165,15 +319,17 @@ export default function FarmerDashboard() {
                             <a href="/farmer/crops" style={{ fontSize: "11px", color: "#60a5fa", textDecoration: "none" }}>View all →</a>
                         </div>
                         {loading ? (
-                            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>Loading...</div>
+                            <AppLoadingState fullScreen={false} />
                         ) : crops.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "24px" }}>
-                                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🌱</div>
-                                <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>No crops listed yet</div>
-                                <a href="/farmer/crops" style={{ textDecoration: "none" }}>
-                                    <div style={{ background: "#4ade80", borderRadius: "10px", padding: "8px 16px", fontSize: "12px", color: "#0a0a0a", fontWeight: "700", display: "inline-block" }}>+ Add First Crop</div>
-                                </a>
-                            </div>
+                            <AppEmptyState
+                                icon="🌱"
+                                title="No crops listed yet"
+                                action={
+                                    <a href="/farmer/crops" style={{ textDecoration: "none" }}>
+                                        <div style={{ background: "#4ade80", borderRadius: "10px", padding: "8px 16px", fontSize: "12px", color: "#0a0a0a", fontWeight: "700", display: "inline-block" }}>+ Add First Crop</div>
+                                    </a>
+                                }
+                            />
                         ) : (
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
                                 {crops.slice(0, 4).map((crop, i) => (
@@ -200,13 +356,11 @@ export default function FarmerDashboard() {
                                 <a href="/farmer/sales" style={{ fontSize: "11px", color: "#60a5fa", textDecoration: "none" }}>View all →</a>
                             </div>
                             {loading ? (
-                                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>Loading...</div>
+                                <AppLoadingState fullScreen={false} />
                             ) : orders.length === 0 ? (
-                                <div style={{ textAlign: "center", padding: "16px", color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>
-                                    No orders yet. List your crops to start selling!
-                                </div>
+                                <AppEmptyState icon="📦" title="No orders yet" description="List your crops to start selling!" />
                             ) : orders.map((order, i) => {
-                                const itemNames = order.order_items?.map((it: any) => it.crop_name).join(", ") || "Order";
+                                const itemNames = order.order_items?.map((it: { crop_name: string }) => it.crop_name).join(", ") || "Order";
                                 const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
                                 const statusColor = order.status === "Delivered" ? "#4ade80" : order.status === "On the way" ? "#fbbf24" : "#60a5fa";
                                 return (
@@ -244,7 +398,6 @@ export default function FarmerDashboard() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+        </FarmerLayout>
     );
 }

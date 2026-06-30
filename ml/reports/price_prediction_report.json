@@ -1,0 +1,55 @@
+{
+  "phase": "ML-2",
+  "task": "Crop Price Prediction",
+  "models_evaluated": [
+    {
+      "model": "LinearRegression",
+      "MAE": 17.8573,
+      "RMSE": 25.6178,
+      "R2": 0.0912
+    },
+    {
+      "model": "RandomForest",
+      "MAE": 2.5662,
+      "RMSE": 3.6878,
+      "R2": 0.9812
+    },
+    {
+      "model": "XGBoost",
+      "MAE": 2.7307,
+      "RMSE": 3.8475,
+      "R2": 0.9795
+    },
+    {
+      "model": "LSTM",
+      "MAE": null,
+      "RMSE": null,
+      "R2": null,
+      "note": "torch not installed"
+    }
+  ],
+  "best_model": "RandomForest",
+  "feature_importance": {
+    "crop_encoded": 0.9241,
+    "location_encoded": 0.0026,
+    "month": 0.017,
+    "week": 0.0058,
+    "year": 0.0025,
+    "season_encoded": 0.0007,
+    "is_peak_season": 0.0414,
+    "quantity_kg": 0.0059
+  },
+  "training_samples": 4000,
+  "test_samples": 1000,
+  "features": [
+    "crop_encoded",
+    "location_encoded",
+    "month",
+    "week",
+    "year",
+    "season_encoded",
+    "is_peak_season",
+    "quantity_kg"
+  ],
+  "target": "price"
+}

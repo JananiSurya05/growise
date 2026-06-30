@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GroWise</string>
+    <string name="title_activity_main">GroWise</string>
+    <string name="package_name">com.growise.app</string>
+    <string name="custom_url_scheme">com.growise.app</string>
+</resources>

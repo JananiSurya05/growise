@@ -1,0 +1,25 @@
+{
+  "phase": "ML-5",
+  "task": "Sentiment Analysis",
+  "models": {
+    "VADER": {
+      "accuracy": 0.812,
+      "type": "rule-based"
+    },
+    "TF-IDF+LogReg": {
+      "accuracy": 1.0,
+      "type": "ml"
+    },
+    "DistilBERT": {
+      "accuracy": "requires GPU + transformers install",
+      "type": "transformer"
+    }
+  },
+  "dataset_size": 1000,
+  "class_distribution": {
+    "positive": 550,
+    "neutral": 242,
+    "negative": 208
+  },
+  "reputation_farmers_scored": 50
+}

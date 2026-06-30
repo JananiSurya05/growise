@@ -1,0 +1,247 @@
+{
+  "passed": [
+    {
+      "label": "home-root",
+      "url": "http://localhost:3000/",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\001-home_root.png"
+    },
+    {
+      "label": "home – h1",
+      "text": "GroWise"
+    },
+    {
+      "label": "login-page",
+      "url": "http://localhost:3000/login",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\002-login_page.png"
+    },
+    {
+      "label": "login – form fields",
+      "count": 0
+    },
+    {
+      "label": "auth-complete",
+      "url": "http://localhost:3000/auth/complete",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\003-auth_complete.png"
+    },
+    {
+      "label": "auth-complete – main",
+      "text": "🌿GroWiseSow Smart. Grow Wise.🌾 FOR FARMERSFarmerList crops, get AI advice, sell directly to consum"
+    },
+    {
+      "label": "farmer-dashboard",
+      "url": "http://localhost:3000/farmer",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\004-farmer_dashboard.png"
+    },
+    {
+      "label": "farmer-crops",
+      "url": "http://localhost:3000/farmer/crops",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\005-farmer_crops.png"
+    },
+    {
+      "label": "farmer-crops – form fields",
+      "count": 0
+    },
+    {
+      "label": "farmer-weather",
+      "url": "http://localhost:3000/farmer/weather",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\007-farmer_weather.png"
+    },
+    {
+      "label": "farmer-sales",
+      "url": "http://localhost:3000/farmer/sales",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\009-farmer_sales.png"
+    },
+    {
+      "label": "farmer-advisor",
+      "url": "http://localhost:3000/farmer/advisor",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\010-farmer_advisor.png"
+    },
+    {
+      "label": "farmer-advisor – form fields",
+      "count": 0
+    },
+    {
+      "label": "farmer-disease",
+      "url": "http://localhost:3000/farmer/disease",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\011-farmer_disease.png"
+    },
+    {
+      "label": "farmer-disease – form fields",
+      "count": 0
+    },
+    {
+      "label": "farmer-income",
+      "url": "http://localhost:3000/farmer/income",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\012-farmer_income.png"
+    },
+    {
+      "label": "consumer-dashboard",
+      "url": "http://localhost:3000/consumer",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\013-consumer_dashboard.png"
+    },
+    {
+      "label": "consumer-shop",
+      "url": "http://localhost:3000/consumer/shop",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\014-consumer_shop.png"
+    },
+    {
+      "label": "consumer-shop – [class*=\"card\"]",
+      "text": "🌾 FOR FARMERSFarmerList crops, get AI advice, sell directly to consumers.Enter as Farmer →"
+    },
+    {
+      "label": "consumer-orders",
+      "url": "http://localhost:3000/consumer/orders",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\016-consumer_orders.png"
+    },
+    {
+      "label": "consumer-order-detail",
+      "url": "http://localhost:3000/consumer/order",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\017-consumer_order_detail.png"
+    },
+    {
+      "label": "consumer-qr",
+      "url": "http://localhost:3000/consumer/qr",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\018-consumer_qr.png"
+    },
+    {
+      "label": "consumer-qr – svg",
+      "text": ""
+    },
+    {
+      "label": "consumer-nutrition",
+      "url": "http://localhost:3000/consumer/nutrition",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\020-consumer_nutrition.png"
+    },
+    {
+      "label": "government-dashboard",
+      "url": "http://localhost:3000/government",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\021-government_dashboard.png"
+    },
+    {
+      "label": "404 – h1",
+      "text": "404"
+    },
+    {
+      "label": "api-weather",
+      "url": "/api/weather",
+      "status": 401
+    },
+    {
+      "label": "api-advisor",
+      "url": "/api/advisor",
+      "status": 405
+    },
+    {
+      "label": "api-disease",
+      "url": "/api/disease",
+      "status": 405
+    },
+    {
+      "label": "api-insights",
+      "url": "/api/insights",
+      "status": 405
+    },
+    {
+      "label": "api-market-intelligence",
+      "url": "/api/market-intelligence",
+      "status": 405
+    },
+    {
+      "label": "api-ml",
+      "url": "/api/ml",
+      "status": 404
+    },
+    {
+      "label": "api-consumer",
+      "url": "/api/consumer",
+      "status": 404
+    },
+    {
+      "label": "farmer-mobile-390",
+      "url": "http://localhost:3000/farmer",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\024-farmer_mobile_390.png"
+    },
+    {
+      "label": "consumer-mobile-390",
+      "url": "http://localhost:3000/consumer",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\025-consumer_mobile_390.png"
+    },
+    {
+      "label": "login-mobile-390",
+      "url": "http://localhost:3000/login",
+      "status": 200,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\026-login_mobile_390.png"
+    }
+  ],
+  "failed": [
+    {
+      "label": "404-page",
+      "url": "http://localhost:3000/nonexistent-route-xyz",
+      "status": 404,
+      "screenshot": "C:\\Users\\admin\\Desktop\\growise\\qa-screenshots\\023-404_page.png",
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    }
+  ],
+  "warnings": [
+    "login: none of [h1, h2, form, [class*=\"login\"], [class*=\"auth\"]] found",
+    "login: email/password inputs not found",
+    "farmer-dashboard: none of [h1, h2, h3, [class*=\"dashboard\"]] found",
+    "farmer-crops: none of [h1, h2, table, [class*=\"crop\"]] found",
+    "farmer-weather: none of [h1, h2, [class*=\"weather\"], [class*=\"temperature\"]] found",
+    "farmer-sales: none of [h1, h2, table, [class*=\"sales\"], [class*=\"revenue\"]] found",
+    "farmer-advisor: none of [h1, h2, [class*=\"advisor\"], [class*=\"chat\"]] found",
+    "farmer-disease: none of [h1, h2, [class*=\"disease\"], [class*=\"scan\"]] found",
+    "farmer-income: none of [h1, h2, [class*=\"income\"], table, canvas] found",
+    "consumer-dashboard: none of [h1, h2, [class*=\"consumer\"], [class*=\"dashboard\"]] found",
+    "consumer-orders: none of [h1, h2, table, [class*=\"order\"]] found",
+    "consumer-order: none of [h1, h2, [class*=\"order\"]] found",
+    "consumer-nutrition: none of [h1, h2, [class*=\"nutrition\"]] found",
+    "government-dashboard: none of [h1, h2, [class*=\"gov\"], [class*=\"dashboard\"], table] found"
+  ],
+  "consoleErrors": {
+    "home-root": [],
+    "login-page": [],
+    "auth-complete": [],
+    "farmer-dashboard": [],
+    "farmer-crops": [],
+    "farmer-weather": [],
+    "farmer-sales": [],
+    "farmer-advisor": [],
+    "farmer-disease": [],
+    "farmer-income": [],
+    "consumer-dashboard": [],
+    "consumer-shop": [],
+    "consumer-orders": [],
+    "consumer-order-detail": [],
+    "consumer-qr": [],
+    "consumer-nutrition": [],
+    "government-dashboard": [],
+    "404-page": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "farmer-mobile-390": [],
+    "consumer-mobile-390": [],
+    "login-mobile-390": []
+  }
+}

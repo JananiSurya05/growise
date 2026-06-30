@@ -1,61 +1,254 @@
 @import "tailwindcss";
 
+/* ===== DESIGN TOKENS (Tailwind v4 CSS-first theme) =====
+   Derived from values already in use across the app (role colors, backgrounds,
+   radii) — not invented. Generates utilities like bg-brand-farmer, rounded-card. */
+@theme {
+  --color-brand-farmer: #4ade80;
+  --color-brand-consumer: #60a5fa;
+  --color-brand-government: #a78bfa;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-surface: #014d4e;
+  --color-surface-elevated: #012e2f;
+
+  /* Semantic aliases — same hex values already used for status meaning
+     (e.g. "Delivered" = success, "Processing" = info) across order/status UI. */
+  --color-success: #4ade80;
+  --color-info: #60a5fa;
+
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  /* Typography scale — collapses the 9px-80px ad hoc range already in use
+     into named steps; existing literal px values are unaffected until migrated. */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 26px;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #014D4E;
+  --foreground: #ffffff;
+  --sidebar-width: 200px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
-/* Mobile Responsive */
-@media (max-width: 768px) {
 
-  /* Hide sidebar on mobile */
-  div[style*="width: 200px"][style*="position: fixed"] {
+/* ===== KEYBOARD FOCUS VISIBILITY (WCAG 2.4.7) ===== */
+:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Suppress the default focus ring only for pointer interactions, not keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-width);
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  transition: transform 0.3s ease;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+}
+
+/* ===== MOBILE HAMBURGER TOGGLE ===== */
+.mobile-nav-toggle {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 100;
+  background: rgba(1, 77, 78, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  backdrop-filter: blur(10px);
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+
+  /* Sidebar hidden by default on mobile */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 220px !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Main content full width on mobile */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 16px !important;
+    padding-top: 56px !important;
+  }
+
+  /* Override inline fixed sidebar (legacy pages not yet updated) */
+  div[style*="position: fixed"][style*="width: 200px"],
+  div[style*="position:fixed"][style*="width: 200px"] {
     display: none !important;
   }
 
-  /* Remove sidebar margin on mobile */
-  div[style*="marginLeft: 200px"] {
+  div[style*="marginLeft: 200px"],
+  div[style*="margin-left: 200px"] {
     margin-left: 0 !important;
-    padding: 16px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 
-  /* Fix grid layouts for mobile */
-  div[style*="gridTemplateColumns: repeat(3"] {
+  /* 3-column → 1-column grids (L-4: login cards) */
+  div[style*="gridTemplateColumns: repeat(3, 1fr)"],
+  div[style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 4-column → 2-column grids (L-3: shop grid) */
+  div[style*="gridTemplateColumns: repeat(4, 1fr)"],
+  div[style*="grid-template-columns: repeat(4, 1fr)"] {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  div[style*="gridTemplateColumns: repeat(4"] {
+  /* 2-column complex grids → single column */
+  div[style*="gridTemplateColumns: 1.2fr"],
+  div[style*="gridTemplateColumns: 2fr 1fr"],
+  div[style*="gridTemplateColumns: 1fr 400px"],
+  div[style*="gridTemplateColumns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Remove fixed bento grid row heights */
+  div[style*="gridTemplateRows: 200px 200px"] {
+    grid-template-rows: unset !important;
+  }
+
+  /* 6-column KPI → 3x2 */
+  div[style*="gridTemplateColumns: repeat(6, 1fr)"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* Products grid fallback */
+  .products-grid {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  div[style*="gridTemplateColumns: 1fr 1fr 1fr"] {
-    grid-template-columns: 1fr !important;
+  /* Hero text scaling */
+  h1[style*="fontSize: 80px"] {
+    font-size: 48px !important;
   }
 
-  div[style*="gridTemplateColumns: 1.2fr"] {
-    grid-template-columns: 1fr !important;
+  /* Banner items wrap */
+  div[style*="justifyContent: space-between"] > div[style*="display: flex"][style*="gap: 28px"] {
+    display: none !important;
   }
 
-  div[style*="gridTemplateColumns: 2fr 1fr"] {
+  /* Hide decorative banner images on very small screens */
+  @media (max-width: 480px) {
+    .products-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    div[style*="gridTemplateColumns: repeat(4, 1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* ===== ANDROID WEBVIEW COMPATIBILITY (A-5) ===== */
+/* backdrop-filter fallback for older Android WebView */
+@supports not (backdrop-filter: blur(20px)) {
+  div[style*="backdropFilter"],
+  div[style*="backdrop-filter"] {
+    background: rgba(1, 46, 47, 0.97) !important;
+  }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(74, 222, 128, 0.2);
+  border-radius: 2px;
+}
+
+/* ===== TOUCH TARGETS (Android minimum 48px) ===== */
+button,
+a[href] {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nav a {
+  min-height: 40px;
+}
+
+/* ===== ANIMATION KEYFRAMES ===== */
+@keyframes dropDown {
+  0% { opacity: 0; transform: translateY(-60px); }
+  60% { transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes subtitleFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 0.5; transform: translateY(0); }
 }

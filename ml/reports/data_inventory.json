@@ -1,0 +1,55 @@
+{
+  "phase": "ML-1",
+  "datasets": {
+    "crop_prices": {
+      "rows": 5000,
+      "columns": [
+        "crop_name",
+        "location",
+        "price",
+        "quantity_kg",
+        "month",
+        "week",
+        "year",
+        "date",
+        "season",
+        "demand",
+        "is_peak_season"
+      ],
+      "crops": 15,
+      "locations": 10,
+      "date_range": [
+        "2022-01-01",
+        "2025-12-31"
+      ],
+      "price_range": [
+        3.04,
+        173.49
+      ],
+      "missing_pct": 0.0
+    },
+    "orders": {
+      "rows": 3000,
+      "farmers": 50,
+      "consumers": 200,
+      "total_revenue": 3160054.17
+    },
+    "reviews": {
+      "rows": 1000,
+      "sentiment_distribution": {
+        "positive": 550,
+        "neutral": 242,
+        "negative": 208
+      },
+      "avg_rating": 3.63
+    }
+  },
+  "ml_readiness_score": 87,
+  "readiness_breakdown": {
+    "temporal_coverage": 95,
+    "label_availability": 100,
+    "feature_diversity": 85,
+    "class_balance": 80,
+    "missing_data": 100
+  }
+}

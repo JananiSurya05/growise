@@ -1,20 +1,17 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState, useRef } from "react";
 import { useAuth } from "../../lib/useAuth";
-import { supabase } from "../../lib/supabase";
+import FarmerLayout from "../../components/FarmerLayout";
 
 export default function DiseaseScanner() {
-    const { loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [image, setImage] = useState<string | null>(null);
     const [result, setResult] = useState("");
     const [loading, setLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -39,40 +36,7 @@ export default function DiseaseScanner() {
     }
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease", active: true },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(248,113,113,0.12)" : "transparent", border: item.active ? "1px solid rgba(248,113,113,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#f87171" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "28px 32px" }}>
+        <FarmerLayout activeHref="/farmer/disease" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"} contentStyle={{ padding: "28px 32px" }}>
                 <div style={{ marginBottom: "28px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
                         <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>📸</div>
@@ -85,7 +49,7 @@ export default function DiseaseScanner() {
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", maxWidth: "1000px" }}>
                     <div>
-                        <div onClick={() => fileRef.current?.click()} style={{ background: image ? "transparent" : "#012e2f", border: image ? "none" : "2px dashed rgba(248,113,113,0.3)", borderRadius: "20px", overflow: "hidden", cursor: "pointer", marginBottom: "14px", minHeight: "280px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                        <button type="button" onClick={() => fileRef.current?.click()} style={{ background: image ? "transparent" : "#012e2f", border: image ? "none" : "2px dashed rgba(248,113,113,0.3)", borderRadius: "20px", overflow: "hidden", cursor: "pointer", marginBottom: "14px", minHeight: "280px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", padding: 0, font: "inherit", width: "100%" }}>
                             {image ? (
                                 <>
                                     <img src={image} alt="uploaded plant" style={{ width: "100%", height: "280px", objectFit: "cover", borderRadius: "20px", display: "block" }} />
@@ -99,7 +63,7 @@ export default function DiseaseScanner() {
                                     <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>JPG, PNG — any plant or crop</div>
                                 </>
                             )}
-                        </div>
+                        </button>
                         <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ display: "none" }} />
                         {image ? (
                             <div style={{ display: "flex", gap: "10px" }}>
@@ -160,8 +124,7 @@ export default function DiseaseScanner() {
                         )}
                     </div>
                 </div>
-            </div>
             <style>{`@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }`}</style>
-        </main>
+        </FarmerLayout>
     );
 }

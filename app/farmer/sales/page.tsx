@@ -1,33 +1,64 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../lib/useAuth";
 import { supabase } from "../../lib/supabase";
+import FarmerLayout from "../../components/FarmerLayout";
+import AppEmptyState from "../../components/ui/AppEmptyState";
+
+type OrderItem = { crop_name: string; quantity: number; price: number; total: number };
+type Order = { id: string; total: number; quantity: number; amount_saved: number; status: string; created_at: string; order_items?: OrderItem[] };
+
+const NEXT_STATUS: Record<string, string> = {
+    Processing: "On the way",
+    "On the way": "Delivered",
+};
 
 export default function SalesPage() {
     const { user, loading: authLoading } = useAuth();
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (user) loadSales();
-    }, [user]);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     async function loadSales() {
+        if (!user) return;
         setLoading(true);
         const { data } = await supabase
             .from("orders")
-            .select("*, order_items(*)")
+            .select("id, total, quantity, amount_saved, status, created_at, order_items(crop_name, quantity, price, total)")
             .eq("farmer_id", user.id)
-            .order("created_at", { ascending: false }) as { data: any[] };
+            .order("created_at", { ascending: false }) as { data: Order[] | null };
         setOrders(data || []);
         setLoading(false);
     }
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    async function advanceStatus(orderId: string, currentStatus: string) {
+        const nextStatus = NEXT_STATUS[currentStatus];
+        if (!nextStatus) return;
+        setUpdatingId(orderId);
+        try {
+            const res = await fetch("/api/orders/update-status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId, status: nextStatus }),
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({ error: "Failed to update status." }));
+                alert(body.error ?? "Failed to update status.");
+                return;
+            }
+            setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o)));
+        } finally {
+            setUpdatingId(null);
+        }
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (user) loadSales();
+    }, [user]);
+
+    if (authLoading) return <AppLoadingState />;
 
     const totalRevenue = orders.reduce((a, o) => a + (o.total || 0), 0);
     const totalOrders = orders.length;
@@ -41,40 +72,7 @@ export default function SalesPage() {
     }
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor" },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales", active: true },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(74,222,128,0.12)" : "transparent", border: item.active ? "1px solid rgba(74,222,128,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <FarmerLayout activeHref="/farmer/sales" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
@@ -115,17 +113,14 @@ export default function SalesPage() {
                     <div style={{ fontSize: "12px", color: "#a78bfa", fontWeight: "600", marginBottom: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>🧾 Recent Orders</div>
 
                     {loading ? (
-                        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px", textAlign: "center", padding: "24px" }}>Loading orders...</div>
+                        <AppLoadingState fullScreen={false} label="Loading orders..." />
                     ) : orders.length === 0 ? (
-                        <div style={{ textAlign: "center", padding: "48px" }}>
-                            <div style={{ fontSize: "48px", marginBottom: "16px" }}>📦</div>
-                            <div style={{ fontSize: "16px", color: "rgba(255,255,255,0.5)" }}>No orders yet</div>
-                            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginTop: "8px" }}>When consumers order your crops, they'll appear here!</div>
-                        </div>
+                        <AppEmptyState icon="📦" title="No orders yet" description="When consumers order your crops, they'll appear here!" />
                     ) : orders.map((order, i) => {
                         const st = getStatus(order.status);
-                        const itemNames = order.order_items?.map((it: any) => it.crop_name).join(", ") || "Order";
+                        const itemNames = order.order_items?.map((it: OrderItem) => it.crop_name).join(", ") || "Order";
                         const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+                        const nextStatus = NEXT_STATUS[order.status];
                         return (
                             <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 0", borderBottom: i < orders.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                                 <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0 }}>🌾</div>
@@ -136,7 +131,18 @@ export default function SalesPage() {
                                     </div>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "3px" }}>
                                         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>🗓️ {date}</div>
-                                        <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 8px", borderRadius: "999px", color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>{order.status}</div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 8px", borderRadius: "999px", color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>{order.status}</div>
+                                            {nextStatus && (
+                                                <button
+                                                    onClick={() => advanceStatus(order.id, order.status)}
+                                                    disabled={updatingId === order.id}
+                                                    style={{ fontSize: "10px", fontWeight: "600", padding: "3px 10px", borderRadius: "999px", color: "#0a0a0a", background: "#4ade80", border: "none", cursor: updatingId === order.id ? "default" : "pointer", opacity: updatingId === order.id ? 0.6 : 1 }}
+                                                >
+                                                    {updatingId === order.id ? "Updating…" : `Mark "${nextStatus}" →`}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +174,6 @@ export default function SalesPage() {
                         </div>
                     </div>
                 )}
-            </div>
-        </main>
+        </FarmerLayout>
     );
 }

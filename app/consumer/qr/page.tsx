@@ -1,27 +1,42 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
 import { QRCodeSVG } from "qrcode.react";
+import type { CropWithFarmer } from "../../lib/types";
+import ConsumerLayout from "../../components/ConsumerLayout";
 
 export default function QRPage() {
     const { loading: authLoading } = useAuth();
-    const [crops, setCrops] = useState<any[]>([]);
-    const [selected, setSelected] = useState<any>(null);
+    const [crops, setCrops] = useState<CropWithFarmer[]>([]);
+    const [selected, setSelected] = useState<CropWithFarmer | null>(null);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadCrops();
-    }, []);
+    const [loadError, setLoadError] = useState("");
 
     async function loadCrops() {
-        const { data } = await supabase
+        setLoading(true);
+        setLoadError("");
+        const { data, error } = await supabase
             .from("crops")
-            .select("*")
-            .eq("status", "Active") as { data: any[] };
-        setCrops(data || []);
+            .select("id, name, price, quantity, location, image_url, badge, status, users:farmer_id(name)")
+            .eq("status", "Active") as { data: CropWithFarmer[] | null; error: { message: string } | null };
+
+        if (error) {
+            console.error("[qr] loadCrops failed:", error.message);
+            setLoadError("Couldn't load products right now. Please try again.");
+            setLoading(false);
+            return;
+        }
+
+        setCrops(data ?? []);
         setLoading(false);
     }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadCrops();
+    }, []);
 
     const nutrients: Record<string, string[]> = {
         tomato: ["Vitamin C", "Lycopene", "Potassium"],
@@ -40,48 +55,10 @@ export default function QRPage() {
         return ["Vitamins", "Minerals", "Fiber"];
     }
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-
-            {/* Sidebar */}
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Consumer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/consumer" },
-                        { icon: "🥦", label: "Shop", href: "/consumer/shop" },
-                        { icon: "📱", label: "Scan QR", href: "/consumer/qr", active: true },
-                        { icon: "🥗", label: "Nutrition", href: "/consumer/nutrition" },
-                        { icon: "📦", label: "My Orders", href: "/consumer/orders" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(96,165,250,0.12)" : "transparent", border: item.active ? "1px solid rgba(96,165,250,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main */}
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <ConsumerLayout activeHref="/consumer/qr">
 
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -127,6 +104,17 @@ export default function QRPage() {
 
                         {loading ? (
                             <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,255,255,0.4)" }}>Loading products...</div>
+                        ) : loadError ? (
+                            <div style={{ textAlign: "center", padding: "48px", background: "#012e2f", borderRadius: "16px", border: "1px solid rgba(248,113,113,0.25)" }}>
+                                <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+                                <div style={{ fontSize: "16px", color: "#f87171", marginBottom: "12px" }}>{loadError}</div>
+                                <button
+                                    onClick={() => loadCrops()}
+                                    style={{ background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: "10px", padding: "8px 20px", color: "#f87171", cursor: "pointer", fontSize: "13px" }}
+                                >
+                                    Retry
+                                </button>
+                            </div>
                         ) : crops.length === 0 ? (
                             <div style={{ textAlign: "center", padding: "48px", background: "#012e2f", borderRadius: "16px" }}>
                                 <div style={{ fontSize: "48px", marginBottom: "16px" }}>📱</div>
@@ -135,7 +123,7 @@ export default function QRPage() {
                         ) : (
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px" }}>
                                 {crops.map((crop) => (
-                                    <div key={crop.id} onClick={() => setSelected(crop)} style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", overflow: "hidden", cursor: "pointer", display: "flex" }}>
+                                    <button type="button" key={crop.id} onClick={() => setSelected(crop)} aria-label={`View farm story for ${crop.name}`} style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", overflow: "hidden", cursor: "pointer", display: "flex", padding: 0, font: "inherit", textAlign: "left", width: "100%" }}>
                                         <div style={{ width: "130px", flexShrink: 0, position: "relative" }}>
                                             <img src={crop.image_url || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop"} alt={crop.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                         </div>
@@ -152,7 +140,7 @@ export default function QRPage() {
                                             </div>
                                             <div style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600" }}>📱 Tap to see Farm Story →</div>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -216,12 +204,12 @@ export default function QRPage() {
                                 <div style={{ fontSize: "12px", color: "#60a5fa", fontWeight: "600", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>📱 Product QR Code</div>
                                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>Scan to verify authenticity</div>
                                 <div style={{ display: "inline-block", background: "white", padding: "16px", borderRadius: "16px", marginBottom: "16px" }}>
-                                    <QRCodeSVG value={`https://growise-rho.vercel.app/consumer/qr?crop=${selected.id}`} size={180} bgColor="white" fgColor="#014D4E" />
+                                    <QRCodeSVG value={`${process.env.NEXT_PUBLIC_APP_URL ?? (typeof window !== "undefined" ? window.location.origin : "")}/consumer/qr?crop=${selected.id}`} size={180} bgColor="white" fgColor="#014D4E" />
                                 </div>
-                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.25)", marginBottom: "16px" }}>growise.app/farm-story/{selected.id?.slice(0, 8)}</div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.25)", marginBottom: "16px" }}>growise.app/consumer/qr/{selected.id?.slice(0, 8)}</div>
                                 <div style={{ background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.15)", borderRadius: "10px", padding: "10px" }}>
                                     <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", lineHeight: "1.6" }}>
-                                        This QR code links directly to this product's verified farm profile on GroWise.
+                                        This QR code links directly to this product&apos;s verified farm profile on GroWise.
                                     </div>
                                 </div>
                             </div>
@@ -255,7 +243,6 @@ export default function QRPage() {
                         </div>
                     </div>
                 )}
-            </div>
-        </main>
+        </ConsumerLayout>
     );
 }

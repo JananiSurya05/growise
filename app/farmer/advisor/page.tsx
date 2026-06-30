@@ -1,7 +1,9 @@
 "use client";
+import AppLoadingState from "../../components/ui/AppLoadingState";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../lib/useAuth";
-import { supabase } from "../../lib/supabase";
+import FarmerSidebar from "../../components/FarmerSidebar";
+import AppTextarea from "../../components/ui/AppTextarea";
 
 const suggestions = [
     "My tomato leaves are turning yellow",
@@ -13,7 +15,7 @@ const suggestions = [
 ];
 
 export default function CropAdvisor() {
-    const { loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [messages, setMessages] = useState<{ role: string; text: string }[]>([
         { role: "ai", text: "Hello! I'm your AI Crop Advisor. Ask me anything about your crops — diseases, soil, weather, fertiliser, or farming techniques. I'm here to help! 🌱" }
     ]);
@@ -25,11 +27,7 @@ export default function CropAdvisor() {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    if (authLoading) return (
-        <div style={{ minHeight: "100vh", background: "#014D4E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading...</div>
-        </div>
-    );
+    if (authLoading) return <AppLoadingState />;
 
     async function sendMessage(question?: string) {
         const q = question || input.trim();
@@ -50,41 +48,10 @@ export default function CropAdvisor() {
     return (
         <main style={{ height: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex", overflow: "hidden" }}>
 
-            {/* Sidebar */}
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Farmer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/farmer" },
-                        { icon: "🌱", label: "My Crops", href: "/farmer/crops" },
-                        { icon: "🤖", label: "AI Advisor", href: "/farmer/advisor", active: true },
-                        { icon: "📸", label: "Disease Scan", href: "/farmer/disease" },
-                        { icon: "🌤️", label: "Weather", href: "/farmer/weather" },
-                        { icon: "💰", label: "Income", href: "/farmer/income" },
-                        { icon: "📊", label: "Sales", href: "/farmer/sales" },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(74,222,128,0.12)" : "transparent", border: item.active ? "1px solid rgba(74,222,128,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span style={{ fontSize: "14px" }}>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
+            <FarmerSidebar activeHref="/farmer/advisor" firstName={user?.user_metadata?.full_name?.split(" ")[0] || "Farmer"} />
 
             {/* Main */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ marginLeft: "200px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                 <div style={{ flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#013a3b" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -150,7 +117,7 @@ export default function CropAdvisor() {
                 <div style={{ flexShrink: 0, padding: "14px 28px 18px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "#013a3b" }}>
                     <div style={{ display: "flex", gap: "10px", alignItems: "flex-end", background: "#012e2f", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "14px", padding: "12px 16px" }}>
                         <span style={{ fontSize: "20px", marginBottom: "2px" }}>🌱</span>
-                        <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Describe your crop problem... (Enter to send)" rows={2} style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: "13px", color: "white", resize: "none", fontFamily: "'Segoe UI', sans-serif", lineHeight: "1.6" }} />
+                        <AppTextarea aria-label="Describe your crop problem" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Describe your crop problem... (Enter to send)" rows={2} style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", lineHeight: "1.6" }} />
                         <button onClick={() => sendMessage()} disabled={loading} style={{ background: loading ? "rgba(74,222,128,0.2)" : "#4ade80", border: "none", borderRadius: "10px", padding: "10px 20px", fontSize: "13px", fontWeight: "700", color: loading ? "#4ade80" : "#0a0a0a", cursor: loading ? "not-allowed" : "pointer", flexShrink: 0 }}>
                             {loading ? "..." : "Send →"}
                         </button>

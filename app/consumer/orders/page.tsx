@@ -1,51 +1,112 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../../lib/supabase";
+import { useConsumerOrderUpdates } from "../../lib/useRealtime";
+import { useToast } from "../../lib/useToast";
+import type { OrderItem } from "../../lib/types";
+import ConsumerLayout from "../../components/ConsumerLayout";
+import AppEmptyState from "../../components/ui/AppEmptyState";
+import AppLoadingState from "../../components/ui/AppLoadingState";
+
+type OrderRow = {
+    id: string;
+    total: number;
+    quantity: number;
+    amount_saved: number;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    items: OrderItem[];
+};
 
 const steps = ["Placed", "Processing", "On the way", "Delivered"];
 
 export default function MyOrders() {
-    const [orders, setOrders] = useState<any[]>([]);
-    const [selected, setSelected] = useState<any>(null);
+    const [orders, setOrders] = useState<OrderRow[]>([]);
+    const [selected, setSelected] = useState<OrderRow | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [consumerId, setConsumerId] = useState<string | undefined>();
+    const { toast } = useToast();
 
-    useEffect(() => {
-        loadOrders();
-    }, []);
-
-    async function loadOrders() {
+    const loadOrders = useCallback(async () => {
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (!authUser) { window.location.href = "/login"; return; }
+        setConsumerId(authUser.id);
 
+        type RawOrder = { id: string; total: number; quantity: number; amount_saved: number; status: string; created_at: string; updated_at: string };
         const { data: ordersData } = await supabase
             .from("orders")
-            .select("*")
+            .select("id, total, quantity, amount_saved, status, created_at, updated_at")
             .eq("consumer_id", authUser.id)
-            .order("created_at", { ascending: false }) as { data: any[] };
+            .order("created_at", { ascending: false }) as { data: RawOrder[] | null };
 
         if (!ordersData) { setLoading(false); return; }
 
-        // Fetch order_items for each order
-        const ordersWithItems = await Promise.all(ordersData.map(async (order) => {
-            const { data: items } = await supabase
-                .from("order_items")
-                .select("*")
-                .eq("order_id", order.id) as { data: any[] };
-            return { ...order, items: items || [] };
+        // Batch-fetch all order_items in a single query (P-3)
+        const orderIds = ordersData.map((o) => o.id);
+        const { data: allItems } = await supabase
+            .from("order_items")
+            .select("id, order_id, crop_name, quantity, price, total")
+            .in("order_id", orderIds) as { data: OrderItem[] | null };
+
+        const itemsByOrder = new Map<string, OrderItem[]>();
+        for (const item of (allItems || [])) {
+            const list = itemsByOrder.get(item.order_id) ?? [];
+            list.push(item);
+            itemsByOrder.set(item.order_id, list);
+        }
+
+        const ordersWithItems: OrderRow[] = ordersData.map((order) => ({
+            ...order,
+            items: itemsByOrder.get(order.id) ?? [],
         }));
 
         setOrders(ordersWithItems);
         if (ordersWithItems.length > 0) setSelected(ordersWithItems[0]);
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadOrders();
+    }, [loadOrders]);
+
+    // Live order status updates via Supabase Realtime
+    const handleOrderUpdate = useCallback((updated: Record<string, unknown>) => {
+        const orderId = updated.id as string;
+        const newStatus = updated.status as string;
+        const newUpdatedAt = updated.updated_at as string | undefined;
+        setOrders(prev => prev.map(o =>
+            o.id === orderId ? { ...o, status: newStatus, updated_at: newUpdatedAt ?? o.updated_at } : o
+        ));
+        setSelected(prev =>
+            prev?.id === orderId ? { ...prev, status: newStatus, updated_at: newUpdatedAt ?? prev.updated_at } : prev
+        );
+        const statusLabel = newStatus === "Delivered" ? "Your order has been delivered!" :
+            newStatus === "On the way" ? "Your order is on the way!" :
+            `Order status updated to ${newStatus}`;
+        const toastType = newStatus === "Delivered" ? "success" : "info";
+        toast({ type: toastType, title: statusLabel, duration: 7000 });
+    }, [toast]);
+
+    useConsumerOrderUpdates(consumerId, handleOrderUpdate);
 
     async function deleteOrder(orderId: string) {
+        if (!consumerId) return;
+        // Ownership enforced: both clauses required so neither succeeds alone
         await supabase.from("order_items").delete().eq("order_id", orderId);
-        await supabase.from("orders").delete().eq("id", orderId);
+        await supabase.from("orders").delete().eq("id", orderId).eq("consumer_id", consumerId);
         setOrders(prev => prev.filter(o => o.id !== orderId));
         if (selected?.id === orderId) setSelected(null);
         setDeleteConfirm(null);
+    }
+
+    function formatUpdatedAt(iso: string | undefined) {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return d.toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
     }
 
     function getStatus(status: string) {
@@ -59,48 +120,15 @@ export default function MyOrders() {
     const totalSaved = orders.reduce((a, o) => a + (o.amount_saved || 0), 0);
 
     return (
-        <main style={{ minHeight: "100vh", background: "#014D4E", fontFamily: "'Segoe UI', sans-serif", display: "flex" }}>
-
-            {/* Sidebar */}
-            <div style={{ width: "200px", flexShrink: 0, background: "rgba(0,0,0,0.25)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", padding: "20px 12px", position: "fixed", height: "100vh", backdropFilter: "blur(20px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px", padding: "0 8px" }}>
-                    <span style={{ fontSize: "18px" }}>🌿</span>
-                    <span style={{ fontSize: "20px", fontWeight: "800", color: "white", letterSpacing: "-0.5px" }}>Gro<span style={{ color: "#4ade80" }}>Wise</span></span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", padding: "0 8px", marginBottom: "20px" }}>Consumer Portal</div>
-                <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {[
-                        { icon: "⚡", label: "Dashboard", href: "/consumer" },
-                        { icon: "🥦", label: "Shop", href: "/consumer/shop" },
-                        { icon: "📱", label: "Scan QR", href: "/consumer/qr" },
-                        { icon: "🥗", label: "Nutrition", href: "/consumer/nutrition" },
-                        { icon: "📦", label: "My Orders", href: "/consumer/orders", active: true },
-                    ].map((item, i) => (
-                        <a key={i} href={item.href} style={{ textDecoration: "none" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px", background: item.active ? "rgba(96,165,250,0.12)" : "transparent", border: item.active ? "1px solid rgba(96,165,250,0.22)" : "1px solid transparent" }}>
-                                <span style={{ fontSize: "14px" }}>{item.icon}</span>
-                                <span style={{ fontSize: "12px", fontWeight: item.active ? "600" : "400", color: item.active ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>{item.label}</span>
-                            </div>
-                        </a>
-                    ))}
-                </nav>
-                <div onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }} style={{ cursor: "pointer" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "8px" }}>
-                        <span>🚪</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Logout</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main */}
-            <div style={{ marginLeft: "200px", flex: 1, padding: "24px 28px" }}>
+        <ConsumerLayout activeHref="/consumer/orders">
 
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "3px" }}>
-                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#60a5fa", boxShadow: "0 0 8px #60a5fa" }} />
-                            <span style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", letterSpacing: ".06em" }}>ORDER HISTORY</span>
+                            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#60a5fa", boxShadow: "0 0 8px #60a5fa", animation: "pulse 2s infinite" }} />
+                            <span style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", letterSpacing: ".06em" }}>ORDER HISTORY · LIVE TRACKING</span>
+                            <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
                         </div>
                         <h1 style={{ fontSize: "20px", fontWeight: "800", color: "white" }}>📦 My Orders</h1>
                     </div>
@@ -129,15 +157,19 @@ export default function MyOrders() {
                     </div>
                 </div>
 
-                {loading && <div style={{ textAlign: "center", padding: "60px", color: "rgba(255,255,255,0.4)" }}>Loading your orders...</div>}
+                {loading && <AppLoadingState fullScreen={false} label="Loading your orders..." />}
 
                 {!loading && orders.length === 0 && (
-                    <div style={{ textAlign: "center", padding: "60px", background: "#012e2f", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.07)" }}>
-                        <div style={{ fontSize: "48px", marginBottom: "16px" }}>📦</div>
-                        <div style={{ fontSize: "18px", fontWeight: "700", color: "white", marginBottom: "8px" }}>No orders yet!</div>
-                        <a href="/consumer/shop" style={{ textDecoration: "none" }}>
-                            <div style={{ background: "#4ade80", color: "#0a0a0a", borderRadius: "12px", padding: "12px 28px", fontSize: "14px", fontWeight: "700", display: "inline-block", marginTop: "12px" }}>Shop Now →</div>
-                        </a>
+                    <div style={{ background: "#012e2f", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <AppEmptyState
+                            icon="📦"
+                            title="No orders yet!"
+                            action={
+                                <a href="/consumer/shop" style={{ textDecoration: "none" }}>
+                                    <div style={{ background: "#4ade80", color: "#0a0a0a", borderRadius: "12px", padding: "12px 28px", fontSize: "14px", fontWeight: "700", display: "inline-block" }}>Shop Now →</div>
+                                </a>
+                            }
+                        />
                     </div>
                 )}
 
@@ -151,7 +183,7 @@ export default function MyOrders() {
                                 const isSelected = selected?.id === order.id;
                                 const date = new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
                                 const itemNames = order.items.length > 0
-                                    ? order.items.map((i: any) => i.crop_name).join(", ")
+                                    ? order.items.map((item: OrderItem) => item.crop_name).join(", ")
                                     : "Order";
 
                                 return (
@@ -159,7 +191,7 @@ export default function MyOrders() {
                                         <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: isSelected ? st.bg : "rgba(0,0,0,0.3)", border: `2px solid ${isSelected ? st.color : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>
                                             {st.icon}
                                         </div>
-                                        <div onClick={() => setSelected(order)} style={{ flex: 1, background: isSelected ? "rgba(96,165,250,0.05)" : "#012e2f", border: isSelected ? "2px solid rgba(96,165,250,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px 16px", cursor: "pointer", position: "relative" }}>
+                                        <div role="button" tabIndex={0} aria-label={`View details for order ${order.id?.slice(0, 8)}`} onClick={() => setSelected(order)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(order); } }} style={{ flex: 1, background: isSelected ? "rgba(96,165,250,0.05)" : "#012e2f", border: isSelected ? "2px solid rgba(96,165,250,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px 16px", cursor: "pointer", position: "relative" }}>
 
                                             {/* Delete button */}
                                             <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(order.id); }} style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "6px", padding: "3px 10px", color: "#f87171", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}>✕ Delete</button>
@@ -172,13 +204,16 @@ export default function MyOrders() {
                                                 <div style={{ textAlign: "right" }}>
                                                     <div style={{ fontSize: "18px", fontWeight: "800", color: "white", marginBottom: "4px" }}>₹{order.total || 0}</div>
                                                     <div style={{ fontSize: "10px", fontWeight: "600", padding: "2px 10px", borderRadius: "999px", color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>{st.icon} {order.status}</div>
+                                                    {formatUpdatedAt(order.updated_at) && (
+                                                        <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", marginTop: "3px" }}>Updated {formatUpdatedAt(order.updated_at)}</div>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             {/* Items summary */}
                                             {order.items.length > 0 && (
                                                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
-                                                    {order.items.map((item: any, i: number) => (
+                                                    {order.items.map((item: OrderItem, i: number) => (
                                                         <div key={i} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px", padding: "3px 8px", fontSize: "10px", color: "rgba(255,255,255,0.6)" }}>
                                                             {item.crop_name} × {item.quantity}kg = ₹{item.total}
                                                         </div>
@@ -223,7 +258,7 @@ export default function MyOrders() {
                                 {/* Bill Summary */}
                                 <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "16px" }}>
                                     <div style={{ fontSize: "11px", color: "#60a5fa", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🛒 Items in this Order</div>
-                                    {selected.items.length > 0 ? selected.items.map((item: any, i: number) => (
+                                    {selected.items.length > 0 ? selected.items.map((item: OrderItem, i: number) => (
                                         <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < selected.items.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                                             <div>
                                                 <div style={{ fontSize: "13px", fontWeight: "600", color: "white" }}>{item.crop_name}</div>
@@ -262,7 +297,12 @@ export default function MyOrders() {
 
                                 {/* Tracking */}
                                 <div style={{ background: "#012e2f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "14px" }}>
-                                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: "600", marginBottom: "12px", textTransform: "uppercase", letterSpacing: ".06em" }}>🚚 Order Tracking</div>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
+                                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: "600", textTransform: "uppercase", letterSpacing: ".06em" }}>🚚 Order Tracking</div>
+                                        {formatUpdatedAt(selected.updated_at) && (
+                                            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>Last updated {formatUpdatedAt(selected.updated_at)}</div>
+                                        )}
+                                    </div>
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         {steps.map((step, i) => {
                                             const curr = steps.findIndex(s => s.toLowerCase() === (selected.status || "").toLowerCase());
@@ -290,7 +330,6 @@ export default function MyOrders() {
                         )}
                     </div>
                 )}
-            </div>
 
             {/* Custom Delete Confirmation Modal */}
             {deleteConfirm && (
@@ -310,6 +349,6 @@ export default function MyOrders() {
                     </div>
                 </div>
             )}
-        </main>
+        </ConsumerLayout>
     );
 }
