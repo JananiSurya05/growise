@@ -64,11 +64,17 @@ export async function proxy(req: NextRequest) {
     }
   );
 
+  // getUser() verifies the JWT against Supabase Auth (network round-trip) and
+  // persists any refreshed tokens via the setAll cookie handler above. This is
+  // the correct call for a security boundary — getSession() only decodes the
+  // cookie without validating its signature, and skips the refresh that fixes
+  // the post-OAuth redirect race.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (error || !user) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -76,7 +82,7 @@ export async function proxy(req: NextRequest) {
   const { data: profile } = await supabase
     .from("users")
     .select("role")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile || profile.role !== required.role) {
