@@ -44,3 +44,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Test artifacts and credentials (never commit)
+tests/storageState/
+tests/playwright-report/
+tests/results/
+playwright-report/
+
+# Logs
+dev-server*.log
+dev-test*.log
+
+# ML runtime artifacts
+mlruns/
+ml/mlflow.db
